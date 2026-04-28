@@ -14,30 +14,9 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _initialized = false;
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initSettings();
-    });
-  }
-
-  Future<void> _initSettings() async {
-    if (_initialized) return;
-    final settings = ref.read(userSettingsProvider);
-    if (settings == null) {
-      final defaultSettings = UserSettings(
-        id: 'default',
-        birthDate: DateTime(1990, 1, 1),
-        lifeExpectancy: 80,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
-      await ref.read(userSettingsProvider.notifier).saveSettings(defaultSettings);
-    }
-    _initialized = true;
   }
 
   @override

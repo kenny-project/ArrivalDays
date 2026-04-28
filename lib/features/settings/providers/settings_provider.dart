@@ -21,12 +21,12 @@ class SettingsViewModel {
     final current = _ref.read(userSettingsProvider);
     debugPrint('[SettingsVM] current settings: $current');
     if (current != null) {
-      await _ref.read(userSettingsProvider.notifier).saveSettings(
-        current.copyWith(
-          birthDate: date,
-          updatedAt: DateTime.now(),
-        ),
+      final newSettings = current.copyWith(
+        birthDate: date,
+        updatedAt: DateTime.now(),
       );
+      debugPrint('[SettingsVM] new birthDate will be: ${newSettings.birthDate}');
+      await _ref.read(userSettingsProvider.notifier).saveSettings(newSettings);
       debugPrint('[SettingsVM] updateBirthDate completed');
     } else {
       debugPrint('[SettingsVM] updateBirthDate: current is null, skipping');
