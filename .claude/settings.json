@@ -20,7 +20,9 @@
       "Bash(git commit -m 'Fix multiple bugs: language switching, import/export, notifications, list display *)",
       "Bash(python3 -m http.server 8080)",
       "Bash(pkill -f \"python3 -m http.server\")",
-      "Bash(git commit -m 'Fix settings init timing - use post frame callback *)"
+      "Bash(git commit -m 'Fix settings init timing - use post frame callback *)",
+      "Read(//home/wmh/Documents/trae_projects/trace_path/lib/com/kenny/trace_path/utils/**)",
+      "Bash(flutter test *)"
     ]
   }
 }
