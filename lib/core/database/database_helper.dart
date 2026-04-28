@@ -19,8 +19,10 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
+    debugPrint('[DB] _initDB called with path: $filePath');
     if (kIsWeb) {
       databaseFactory = databaseFactoryFfiWeb;
+      debugPrint('[DB] Web platform detected, using FFI web');
       return await databaseFactory.openDatabase(
         filePath,
         options: OpenDatabaseOptions(
@@ -32,6 +34,7 @@ class DatabaseHelper {
 
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
+    debugPrint('[DB] Native platform, DB path: $path');
 
     return await openDatabase(
       path,
@@ -41,25 +44,40 @@ class DatabaseHelper {
   }
 
   Future<void> _createDB(Database db, int version) async {
+    debugPrint('[DB] _createDB called');
     await db.execute(createUserSettingsTable);
     await db.execute(createCountdownTargetsTable);
+    debugPrint('[DB] Tables created successfully');
   }
 
   // UserSettings CRUD
   Future<int> insertUserSettings(UserSettings settings) async {
     final db = await database;
-    return await db.insert(
+    debugPrint('[DB] insertUserSettings called: ${settings.id}');
+    debugPrint('[DB]   birthDate: ${settings.birthDate}');
+    debugPrint('[DB]   isDarkMode: ${settings.isDarkMode}');
+    debugPrint('[DB]   language: ${settings.language}');
+    final result = await db.insert(
       tableUserSettings,
       settings.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    debugPrint('[DB] insertUserSettings result: $result');
+    return result;
   }
 
   Future<UserSettings?> getUserSettings() async {
     final db = await database;
+    debugPrint('[DB] getUserSettings called');
     final maps = await db.query(tableUserSettings, limit: 1);
-    if (maps.isEmpty) return null;
-    return UserSettings.fromMap(maps.first);
+    debugPrint('[DB] getUserSettings query result count: ${maps.length}');
+    if (maps.isEmpty) {
+      debugPrint('[DB] getUserSettings: no settings found');
+      return null;
+    }
+    final result = UserSettings.fromMap(maps.first);
+    debugPrint('[DB] getUserSettings: ${result.id}, birthDate: ${result.birthDate}');
+    return result;
   }
 
   Future<int> updateUserSettings(UserSettings settings) async {
@@ -75,16 +93,21 @@ class DatabaseHelper {
   // CountdownTarget CRUD
   Future<int> insertCountdownTarget(CountdownTarget target) async {
     final db = await database;
-    return await db.insert(
+    debugPrint('[DB] insertCountdownTarget called: ${target.id}, name: ${target.name}, type: ${target.type}');
+    final result = await db.insert(
       tableCountdownTargets,
       target.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    debugPrint('[DB] insertCountdownTarget result: $result');
+    return result;
   }
 
   Future<List<CountdownTarget>> getAllCountdownTargets() async {
     final db = await database;
+    debugPrint('[DB] getAllCountdownTargets called');
     final maps = await db.query(tableCountdownTargets);
+    debugPrint('[DB] getAllCountdownTargets query result count: ${maps.length}');
     return maps.map((map) => CountdownTarget.fromMap(map)).toList();
   }
 
