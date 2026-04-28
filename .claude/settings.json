@@ -11,7 +11,13 @@
       "Bash(git add *)",
       "Bash(flutter devices *)",
       "Bash(flutter run *)",
-      "Bash(flutter create *)"
+      "Bash(flutter create *)",
+      "Bash(git push *)",
+      "Bash(flutter analyze *)",
+      "Bash(pkill -f \"flutter run\")",
+      "Bash(pkill -f gradle)",
+      "Bash(flutter build *)",
+      "Bash(git commit -m 'Fix multiple bugs: language switching, import/export, notifications, list display *)"
     ]
   }
 }

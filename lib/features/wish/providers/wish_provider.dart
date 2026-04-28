@@ -12,7 +12,7 @@ class WishViewModel {
   WishViewModel(this._ref);
 
   List<CountdownTarget> get uncompletedWishes {
-    final targets = _ref.read(countdownTargetsProvider);
+    final targets = _ref.watch(countdownTargetsProvider);
     return targets
         .where((t) => t.type == CountdownTargetType.wish && !t.isCompleted)
         .toList()
@@ -25,7 +25,7 @@ class WishViewModel {
   }
 
   List<CountdownTarget> get completedWishes {
-    final targets = _ref.read(countdownTargetsProvider);
+    final targets = _ref.watch(countdownTargetsProvider);
     return targets
         .where((t) => t.type == CountdownTargetType.wish && t.isCompleted)
         .toList()

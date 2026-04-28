@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../models/countdown_target.dart';
 import '../../../shared/widgets/countdown_item.dart';
 import '../../../shared/widgets/empty_state.dart';
-import '../providers/anniversary_provider.dart';
+import '../../../shared/providers/database_providers.dart';
 import '../widgets/anniversary_form.dart';
 import 'anniversary_detail_screen.dart';
 
@@ -11,8 +12,15 @@ class AnniversaryListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.watch(anniversaryViewModelProvider);
-    final anniversaries = viewModel.allAnniversaries;
+    final targets = ref.watch(countdownTargetsProvider);
+    final anniversaries = targets
+        .where((t) => t.type == CountdownTargetType.anniversary || t.type == CountdownTargetType.birthday)
+        .toList()
+      ..sort((a, b) {
+        if (a.targetDate == null) return 1;
+        if (b.targetDate == null) return -1;
+        return a.targetDate!.compareTo(b.targetDate!);
+      });
 
     return Scaffold(
       appBar: AppBar(
@@ -58,7 +66,7 @@ class AnniversaryListScreen extends ConsumerWidget {
       isScrollControlled: true,
       builder: (_) => AnniversaryForm(
         onSave: (target) {
-          ref.read(anniversaryViewModelProvider).addAnniversary(target);
+          ref.read(countdownTargetsProvider.notifier).addTarget(target);
           Navigator.pop(context);
         },
       ),

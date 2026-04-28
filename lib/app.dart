@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
+import 'shared/providers/database_providers.dart';
 import 'features/clock/screens/clock_screen.dart';
 import 'features/anniversary/screens/anniversary_list_screen.dart';
 import 'features/wish/screens/wish_list_screen.dart';
@@ -13,12 +14,15 @@ class ArrivalDaysApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(userSettingsProvider);
+    final isDarkMode = settings?.isDarkMode ?? false;
+
     return MaterialApp(
       title: 'ArrivalDays',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -29,6 +33,7 @@ class ArrivalDaysApp extends ConsumerWidget {
         Locale('en'),
         Locale('zh'),
       ],
+      locale: Locale(settings?.language ?? 'zh'),
       home: const MainScreen(),
     );
   }

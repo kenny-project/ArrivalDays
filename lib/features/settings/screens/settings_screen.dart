@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/user_settings.dart';
 import '../../../shared/providers/database_providers.dart';
+import '../../../core/services/export_service.dart';
 import '../providers/settings_provider.dart';
+import 'notification_settings_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -90,8 +92,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: const Text('提醒设置'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('提醒设置页面（待开发）')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationSettingsScreen(),
+                      ),
                     );
                   },
                 ),
@@ -109,20 +114,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   leading: const Icon(Icons.file_upload),
                   title: const Text('数据导出'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('数据导出功能（待开发）')),
-                    );
+                  onTap: () async {
+                    await ExportService.instance.shareExport();
                   },
                 ),
                 ListTile(
                   leading: const Icon(Icons.file_download),
                   title: const Text('数据导入'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('数据导入功能（待开发）')),
-                    );
+                  onTap: () async {
+                    final success = await ExportService.instance.importFromFile();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(success ? '导入成功' : '导入失败'),
+                        ),
+                      );
+                    }
                   },
                 ),
                 const Divider(),
