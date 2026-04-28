@@ -21,7 +21,7 @@ class WishDetailScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => _showEditDialog(context),
+            onPressed: () => _showEditDialog(context, ref),
           ),
           IconButton(
             icon: const Icon(Icons.delete),
@@ -96,7 +96,7 @@ class WishDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showEditDialog(BuildContext context) {
+  void _showEditDialog(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
