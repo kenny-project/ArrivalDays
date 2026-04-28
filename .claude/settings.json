@@ -17,7 +17,10 @@
       "Bash(pkill -f \"flutter run\")",
       "Bash(pkill -f gradle)",
       "Bash(flutter build *)",
-      "Bash(git commit -m 'Fix multiple bugs: language switching, import/export, notifications, list display *)"
+      "Bash(git commit -m 'Fix multiple bugs: language switching, import/export, notifications, list display *)",
+      "Bash(python3 -m http.server 8080)",
+      "Bash(pkill -f \"python3 -m http.server\")",
+      "Bash(git commit -m 'Fix settings init timing - use post frame callback *)"
     ]
   }
 }

@@ -14,13 +14,18 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  bool _initialized = false;
+
   @override
   void initState() {
     super.initState();
-    _initSettings();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initSettings();
+    });
   }
 
   Future<void> _initSettings() async {
+    if (_initialized) return;
     final settings = ref.read(userSettingsProvider);
     if (settings == null) {
       final defaultSettings = UserSettings(
@@ -32,6 +37,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       );
       await ref.read(userSettingsProvider.notifier).saveSettings(defaultSettings);
     }
+    _initialized = true;
   }
 
   @override
