@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter pub *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git -C /home/wmh/Documents/android/ArrivalDays log --oneline -3)",
+      "Bash(git -C /home/wmh/Documents/android/ArrivalDays add lib/models/user_settings.dart lib/models/countdown_target.dart lib/core/database/tables.dart lib/core/database/database_helper.dart lib/core/utils/countdown_utils.dart lib/core/utils/date_utils.dart)",
+      "Bash(git -C /home/wmh/Documents/android/ArrivalDays diff --cached --stat)",
+      "Bash(git -C /home/wmh/Documents/android/ArrivalDays commit -m ' *)",
+      "Bash(git -C /home/wmh/Documents/android/ArrivalDays status)",
+      "Bash(git add *)",
+      "Bash(flutter devices *)",
+      "Bash(flutter run *)",
+      "Bash(flutter create *)"
+    ]
+  }
+}
