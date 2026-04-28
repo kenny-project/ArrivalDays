@@ -2,12 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/countdown_target.dart';
 import '../../../shared/providers/database_providers.dart';
 
-final clockTickProvider = StreamProvider<DateTime>((ref) {
-  return Stream.periodic(const Duration(seconds: 1), (_) => DateTime.now());
-});
-
 final lifeTimerProvider = Provider<CountdownTarget?>((ref) {
-  ref.watch(clockTickProvider);
   final targets = ref.watch(countdownTargetsProvider);
   try {
     return targets.firstWhere((t) => t.type == CountdownTargetType.lifeTimer);
@@ -22,7 +17,6 @@ final retirementTimerProvider = Provider<DateTime?>((ref) {
 });
 
 final anniversaryListProvider = Provider<List<CountdownTarget>>((ref) {
-  ref.watch(clockTickProvider);
   final targets = ref.watch(countdownTargetsProvider);
   return targets
       .where((t) => t.type == CountdownTargetType.anniversary || t.type == CountdownTargetType.birthday)
@@ -35,7 +29,6 @@ final anniversaryListProvider = Provider<List<CountdownTarget>>((ref) {
 });
 
 final wishListProvider = Provider<List<CountdownTarget>>((ref) {
-  ref.watch(clockTickProvider);
   final targets = ref.watch(countdownTargetsProvider);
   return targets
       .where((t) => t.type == CountdownTargetType.wish && !t.isCompleted)

@@ -48,10 +48,14 @@ class CountdownUtils {
 
     if (difference.isNegative) {
       final absDifference = difference.abs();
+      final years = absDifference.inDays ~/ 365;
+      final remainingDays = absDifference.inDays % 365;
+      final months = remainingDays ~/ 30;
+      final days = remainingDays % 30;
       return CountdownDuration(
-        years: 0,
-        months: 0,
-        days: absDifference.inDays,
+        years: years,
+        months: months,
+        days: days,
         hours: absDifference.inHours % 24,
         minutes: absDifference.inMinutes % 60,
         seconds: absDifference.inSeconds % 60,
@@ -59,10 +63,14 @@ class CountdownUtils {
       );
     }
 
+    final years = difference.inDays ~/ 365;
+    final remainingDays = difference.inDays % 365;
+    final months = remainingDays ~/ 30;
+    final days = remainingDays % 30;
     return CountdownDuration(
-      years: 0,
-      months: 0,
-      days: difference.inDays,
+      years: years,
+      months: months,
+      days: days,
       hours: difference.inHours % 24,
       minutes: difference.inMinutes % 60,
       seconds: difference.inSeconds % 60,

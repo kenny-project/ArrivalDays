@@ -1,15 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/widgets/countdown_item.dart';
+import '../../../shared/providers/database_providers.dart';
 import '../providers/clock_provider.dart';
 import '../widgets/life_timer_card.dart';
 import '../widgets/clock_section_header.dart';
 
-class ClockScreen extends ConsumerWidget {
+class ClockScreen extends ConsumerStatefulWidget {
   const ClockScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ClockScreen> createState() => _ClockScreenState();
+}
+
+class _ClockScreenState extends ConsumerState<ClockScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {});
+        _startTimer();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final anniversaries = ref.watch(anniversaryListProvider);
     final wishes = ref.watch(wishListProvider);
 
@@ -19,7 +40,7 @@ class ClockScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.invalidate(clockTickProvider);
+          ref.invalidate(countdownTargetsProvider);
         },
         child: ListView(
           children: [

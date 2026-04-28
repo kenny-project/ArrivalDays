@@ -22,7 +22,11 @@
       "Bash(pkill -f \"python3 -m http.server\")",
       "Bash(git commit -m 'Fix settings init timing - use post frame callback *)",
       "Read(//home/wmh/Documents/trae_projects/trace_path/lib/com/kenny/trace_path/utils/**)",
-      "Bash(flutter test *)"
+      "Bash(flutter test *)",
+      "Read(//home/wmh/Android/Sdk/**)",
+      "Bash(/home/wmh/Programs/flutter/bin/flutter devices *)",
+      "Bash(/home/wmh/Programs/flutter/bin/flutter build *)",
+      "Bash(export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn)"
     ]
   }
 }
