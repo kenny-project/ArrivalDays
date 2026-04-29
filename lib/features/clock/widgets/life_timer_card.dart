@@ -96,6 +96,8 @@ class LifeTimerCard extends ConsumerWidget {
     final elapsed = DateTime.now().difference(birthDate);
     final years = elapsed.inDays ~/ 365;
     final months = (elapsed.inDays % 365) ~/ 30;
+    final hours = elapsed.inHours % 24;
+    final minutes = elapsed.inMinutes % 60;
 
     return Row(
       children: [
@@ -104,7 +106,7 @@ class LifeTimerCard extends ConsumerWidget {
           style: theme.textTheme.bodyMedium,
         ),
         Text(
-          '${years}年${months}月',
+          '${years}年${months}月${hours.toString().padLeft(2, '0')}时${minutes.toString().padLeft(2, '0')}分',
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: theme.colorScheme.secondary,
