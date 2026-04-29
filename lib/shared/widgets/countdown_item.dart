@@ -5,16 +5,20 @@ import '../../models/countdown_target.dart';
 class CountdownItem extends StatelessWidget {
   final CountdownTarget target;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
   final VoidCallback? onComplete;
   final bool showCompleteButton;
+  final bool showDeleteAction;
   final bool isOverdue;
 
   const CountdownItem({
     super.key,
     required this.target,
     this.onTap,
+    this.onDelete,
     this.onComplete,
     this.showCompleteButton = false,
+    this.showDeleteAction = true,
     this.isOverdue = false,
   });
 
@@ -66,14 +70,20 @@ class CountdownItem extends StatelessWidget {
 
     return Dismissible(
       key: Key(target.id),
-      direction: DismissDirection.endToStart,
+      direction: showDeleteAction ? DismissDirection.endToStart : DismissDirection.none,
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         color: Colors.red,
         child: const Icon(Icons.delete, color: Colors.white),
       ),
-      onDismissed: (_) => onTap?.call(),
+      confirmDismiss: (_) async {
+        if (onDelete != null) {
+          onDelete!();
+          return true;
+        }
+        return false;
+      },
       child: ListTile(
         leading: Icon(_icon, color: isBirthday ? Colors.pink : theme.colorScheme.primary),
         title: Text(_displayName),

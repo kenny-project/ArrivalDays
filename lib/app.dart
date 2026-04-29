@@ -49,19 +49,26 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    ClockScreen(),
-    AnniversaryListScreen(),
-    WishListScreen(),
-    SettingsScreen(),
-  ];
+  void _navigateToTab(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: _screens,
+        children: [
+          ClockScreen(
+            onNavigateToAnniversary: () => _navigateToTab(1),
+            onNavigateToWish: () => _navigateToTab(2),
+          ),
+          const AnniversaryListScreen(),
+          const WishListScreen(),
+          const SettingsScreen(),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,

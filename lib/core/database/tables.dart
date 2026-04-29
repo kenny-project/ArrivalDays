@@ -22,6 +22,7 @@ const String createCountdownTargetsTable = '''
     target_date INTEGER,
     type TEXT NOT NULL,
     is_recurring INTEGER DEFAULT 0,
+    is_lunar_calendar INTEGER DEFAULT 0,
     is_completed INTEGER DEFAULT 0,
     completed_at INTEGER,
     relation TEXT,

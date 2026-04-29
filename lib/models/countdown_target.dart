@@ -11,6 +11,7 @@ class CountdownTarget {
   final DateTime? targetDate;
   final CountdownTargetType type;
   final bool isRecurring;
+  final bool isLunarCalendar;
   final bool isCompleted;
   final DateTime? completedAt;
   final String? relation;
@@ -25,6 +26,7 @@ class CountdownTarget {
     this.targetDate,
     required this.type,
     this.isRecurring = false,
+    this.isLunarCalendar = false,
     this.isCompleted = false,
     this.completedAt,
     this.relation,
@@ -40,6 +42,7 @@ class CountdownTarget {
     DateTime? targetDate,
     CountdownTargetType? type,
     bool? isRecurring,
+    bool? isLunarCalendar,
     bool? isCompleted,
     DateTime? completedAt,
     String? relation,
@@ -54,6 +57,7 @@ class CountdownTarget {
       targetDate: targetDate ?? this.targetDate,
       type: type ?? this.type,
       isRecurring: isRecurring ?? this.isRecurring,
+      isLunarCalendar: isLunarCalendar ?? this.isLunarCalendar,
       isCompleted: isCompleted ?? this.isCompleted,
       completedAt: completedAt ?? this.completedAt,
       relation: relation ?? this.relation,
@@ -71,6 +75,7 @@ class CountdownTarget {
       'target_date': targetDate?.millisecondsSinceEpoch,
       'type': type.name,
       'is_recurring': isRecurring ? 1 : 0,
+      'is_lunar_calendar': isLunarCalendar ? 1 : 0,
       'is_completed': isCompleted ? 1 : 0,
       'completed_at': completedAt?.millisecondsSinceEpoch,
       'relation': relation,
@@ -93,6 +98,7 @@ class CountdownTarget {
         orElse: () => CountdownTargetType.wish,
       ),
       isRecurring: (map['is_recurring'] as int?) == 1,
+      isLunarCalendar: (map['is_lunar_calendar'] as int?) == 1,
       isCompleted: (map['is_completed'] as int?) == 1,
       completedAt: map['completed_at'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['completed_at'] as int)

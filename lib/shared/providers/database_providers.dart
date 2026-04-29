@@ -25,10 +25,16 @@ class UserSettingsNotifier extends StateNotifier<UserSettings?> {
     Log.i(LogTag.provider, 'settings loaded: ${state?.birthDate}');
   }
 
-  Future<void> saveSettings(UserSettings settings) async {
-    await _db.insertUserSettings(settings);
-    state = await _db.getUserSettings();
-    Log.i(LogTag.provider, 'settings saved, reload: ${state?.birthDate}');
+  Future<bool> saveSettings(UserSettings settings) async {
+    try {
+      await _db.insertUserSettings(settings);
+      state = settings;
+      Log.i(LogTag.provider, 'settings saved: ${settings.birthDate}');
+      return true;
+    } catch (e) {
+      Log.e(LogTag.provider, 'save settings failed: $e');
+      return false;
+    }
   }
 }
 
@@ -49,19 +55,40 @@ class CountdownTargetsNotifier extends StateNotifier<List<CountdownTarget>> {
     Log.i(LogTag.provider, 'targets loaded: ${state.length}');
   }
 
-  Future<void> addTarget(CountdownTarget target) async {
-    await _db.insertCountdownTarget(target);
-    state = [...state, target];
+  Future<bool> addTarget(CountdownTarget target) async {
+    try {
+      await _db.insertCountdownTarget(target);
+      state = [...state, target];
+      Log.i(LogTag.provider, 'addTarget success: ${target.name}');
+      return true;
+    } catch (e) {
+      Log.e(LogTag.provider, 'addTarget failed: $e');
+      return false;
+    }
   }
 
-  Future<void> updateTarget(CountdownTarget target) async {
-    await _db.updateCountdownTarget(target);
-    state = state.map((t) => t.id == target.id ? target : t).toList();
+  Future<bool> updateTarget(CountdownTarget target) async {
+    try {
+      await _db.updateCountdownTarget(target);
+      state = state.map((t) => t.id == target.id ? target : t).toList();
+      Log.i(LogTag.provider, 'updateTarget success: ${target.name}');
+      return true;
+    } catch (e) {
+      Log.e(LogTag.provider, 'updateTarget failed: $e');
+      return false;
+    }
   }
 
-  Future<void> deleteTarget(String id) async {
-    await _db.deleteCountdownTarget(id);
-    state = state.where((t) => t.id != id).toList();
+  Future<bool> deleteTarget(String id) async {
+    try {
+      await _db.deleteCountdownTarget(id);
+      state = state.where((t) => t.id != id).toList();
+      Log.i(LogTag.provider, 'deleteTarget success: $id');
+      return true;
+    } catch (e) {
+      Log.e(LogTag.provider, 'deleteTarget failed: $e');
+      return false;
+    }
   }
 
   Future<void> refresh() async {

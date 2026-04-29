@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/countdown_utils.dart';
 import '../../../models/countdown_target.dart';
+import '../../../shared/providers/database_providers.dart';
 import '../../../shared/widgets/countdown_display.dart';
 import '../providers/anniversary_provider.dart';
 import '../widgets/anniversary_form.dart';
@@ -102,15 +103,21 @@ class AnniversaryDetailScreen extends ConsumerWidget {
   }
 
   void _showEditDialog(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.read(anniversaryViewModelProvider);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (_) => AnniversaryForm(
         target: target,
-        onSave: (updated) {
-          viewModel.updateAnniversary(updated);
-          Navigator.pop(context);
+        onSave: (updated) async {
+          final success = await ref.read(countdownTargetsProvider.notifier).updateTarget(updated);
+          if (success && context.mounted) {
+            Navigator.pop(context);
+          } else if (!success && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('保存失败')),
+            );
+          }
+          return success;
         },
       ),
     );

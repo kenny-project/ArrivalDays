@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../models/countdown_target.dart';
 import '../../../shared/widgets/countdown_item.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/providers/database_providers.dart';
 import '../providers/wish_provider.dart';
 import '../widgets/wish_form.dart';
-import 'wish_detail_screen.dart';
 
 class WishListScreen extends ConsumerStatefulWidget {
   const WishListScreen({super.key});
@@ -16,6 +17,7 @@ class WishListScreen extends ConsumerStatefulWidget {
 class _WishListScreenState extends ConsumerState<WishListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -25,6 +27,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -70,6 +73,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
     }
 
     return ListView.builder(
+      controller: _scrollController,
       itemCount: wishes.length,
       itemBuilder: (context, index) {
         final target = wishes[index];
@@ -80,16 +84,12 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
           target: target,
           isOverdue: isOverdue,
           showCompleteButton: true,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => WishDetailScreen(target: target),
-              ),
-            );
-          },
+          onTap: () => _showEditDialog(context, target),
           onComplete: () {
             viewModel.completeWish(target.id);
+          },
+          onDelete: () {
+            viewModel.deleteWish(target.id);
           },
         );
       },
@@ -104,30 +104,35 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
     }
 
     return ListView.builder(
+      controller: _scrollController,
       itemCount: wishes.length,
       itemBuilder: (context, index) {
         final target = wishes[index];
 
-        return ListTile(
-          leading: const Icon(Icons.check_circle, color: Colors.green),
-          title: Text(target.name),
-          subtitle: target.completedAt != null
-              ? Text('完成于: ${target.completedAt!.toString().split(' ')[0]}')
-              : null,
-          trailing: TextButton(
-            onPressed: () {
-              viewModel.reactivateWish(target.id);
-            },
-            child: const Text('重新激活'),
+        return Dismissible(
+          key: Key(target.id),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            color: Colors.red,
+            child: const Icon(Icons.delete, color: Colors.white),
           ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => WishDetailScreen(target: target),
-              ),
-            );
-          },
+          onDismissed: (_) => viewModel.deleteWish(target.id),
+          child: ListTile(
+            leading: const Icon(Icons.check_circle, color: Colors.green),
+            title: Text(target.name),
+            subtitle: target.completedAt != null
+                ? Text('完成于: ${target.completedAt!.toString().split(' ')[0]}')
+                : null,
+            trailing: TextButton(
+              onPressed: () {
+                viewModel.reactivateWish(target.id);
+              },
+              child: const Text('重新激活'),
+            ),
+            onTap: () => _showEditDialog(context, target),
+          ),
         );
       },
     );
@@ -138,9 +143,37 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
       context: context,
       isScrollControlled: true,
       builder: (_) => WishForm(
-        onSave: (target) {
-          ref.read(wishViewModelProvider).addWish(target);
-          Navigator.pop(context);
+        onSave: (target) async {
+          final success = await ref.read(countdownTargetsProvider.notifier).addTarget(target);
+          if (success && context.mounted) {
+            Navigator.pop(context);
+          } else if (!success && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('保存失败')),
+            );
+          }
+          return success;
+        },
+      ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, CountdownTarget target) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => WishForm(
+        target: target,
+        onSave: (updated) async {
+          final success = await ref.read(countdownTargetsProvider.notifier).updateTarget(updated);
+          if (success && context.mounted) {
+            Navigator.pop(context);
+          } else if (!success && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('保存失败')),
+            );
+          }
+          return success;
         },
       ),
     );

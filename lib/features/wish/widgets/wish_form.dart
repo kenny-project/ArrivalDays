@@ -4,7 +4,7 @@ import '../../../models/countdown_target.dart';
 
 class WishForm extends StatefulWidget {
   final CountdownTarget? target;
-  final Function(CountdownTarget) onSave;
+  final Future<bool> Function(CountdownTarget) onSave;
 
   const WishForm({
     super.key,
@@ -143,7 +143,7 @@ class _WishFormState extends State<WishForm> {
     }
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (_formKey.currentState!.validate()) {
       final target = CountdownTarget(
         id: widget.target?.id ?? const Uuid().v4(),
@@ -156,7 +156,7 @@ class _WishFormState extends State<WishForm> {
         createdAt: widget.target?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      widget.onSave(target);
+      await widget.onSave(target);
     }
   }
 }

@@ -4,7 +4,7 @@ import '../../../models/countdown_target.dart';
 
 class AnniversaryForm extends StatefulWidget {
   final CountdownTarget? target;
-  final Function(CountdownTarget) onSave;
+  final Future<bool> Function(CountdownTarget) onSave;
 
   const AnniversaryForm({
     super.key,
@@ -23,6 +23,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
   DateTime? _selectedDate;
   bool _isBirthday = false;
   bool _isRecurring = true;
+  bool _isLunarCalendar = false;
   bool _hasNotification = true;
 
   @override
@@ -33,6 +34,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
     _selectedDate = widget.target?.targetDate;
     _isBirthday = widget.target?.type == CountdownTargetType.birthday;
     _isRecurring = widget.target?.isRecurring ?? true;
+    _isLunarCalendar = widget.target?.isLunarCalendar ?? false;
     _hasNotification = widget.target?.hasNotification ?? true;
   }
 
@@ -135,6 +137,19 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
                         });
                       },
               ),
+              if (_isBirthday) ...[
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('农历'),
+                  value: _isLunarCalendar,
+                  onChanged: (value) {
+                    setState(() {
+                      _isLunarCalendar = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              ],
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('通知提醒'),
@@ -181,7 +196,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
     }
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (_formKey.currentState!.validate() && _selectedDate != null) {
       final target = CountdownTarget(
         id: widget.target?.id ?? const Uuid().v4(),
@@ -189,12 +204,13 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
         targetDate: _selectedDate,
         type: _isBirthday ? CountdownTargetType.birthday : CountdownTargetType.anniversary,
         isRecurring: _isRecurring,
+        isLunarCalendar: _isBirthday ? _isLunarCalendar : false,
         relation: _isBirthday ? _relationController.text : null,
         hasNotification: _hasNotification,
         createdAt: widget.target?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      widget.onSave(target);
+      await widget.onSave(target);
     }
   }
 }

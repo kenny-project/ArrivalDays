@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/countdown_target.dart';
+import '../../../shared/providers/database_providers.dart';
 import '../../../shared/widgets/countdown_display.dart';
 import '../providers/wish_provider.dart';
 import '../widgets/wish_form.dart';
@@ -102,9 +103,16 @@ class WishDetailScreen extends ConsumerWidget {
       isScrollControlled: true,
       builder: (_) => WishForm(
         target: target,
-        onSave: (updated) {
-          ref.read(wishViewModelProvider).updateWish(updated);
-          Navigator.pop(context);
+        onSave: (updated) async {
+          final success = await ref.read(countdownTargetsProvider.notifier).updateTarget(updated);
+          if (success && context.mounted) {
+            Navigator.pop(context);
+          } else if (!success && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('保存失败')),
+            );
+          }
+          return success;
         },
       ),
     );

@@ -26,8 +26,9 @@ class DatabaseHelper {
       return await databaseFactory.openDatabase(
         filePath,
         options: OpenDatabaseOptions(
-          version: 1,
+          version: 2,
           onCreate: _createDB,
+          onUpgrade: _upgradeDB,
         ),
       );
     }
@@ -38,9 +39,18 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
+  }
+
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    Log.i(LogTag.db, 'upgrade DB: $oldVersion -> $newVersion');
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE $tableCountdownTargets ADD COLUMN is_lunar_calendar INTEGER DEFAULT 0');
+      Log.i(LogTag.db, 'added is_lunar_calendar column');
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {

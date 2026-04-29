@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/countdown_utils.dart';
+import '../../../core/utils/logger.dart';
 import '../../../shared/providers/database_providers.dart';
 import '../providers/clock_provider.dart';
 
@@ -12,6 +13,7 @@ class LifeTimerCard extends ConsumerWidget {
     final lifeTimer = ref.watch(lifeTimerProvider);
     final settings = ref.watch(userSettingsProvider);
     final retirementDate = ref.watch(retirementTimerProvider);
+    Log.i(LogTag.ui, 'LifeTimerCard build - lifeTimer: ${lifeTimer?.targetDate}, retirementDate: $retirementDate');
     final theme = Theme.of(context);
 
     return Card(

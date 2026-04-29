@@ -28,13 +28,14 @@ void main() {
         targetDate: DateTime(1990, 6, 15),
         type: CountdownTargetType.birthday,
         relation: '妈妈',
+        isLunarCalendar: true,
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
       );
 
       expect(target.type, CountdownTargetType.birthday);
       expect(target.relation, '妈妈');
-      expect(target.isRecurring, false);
+      expect(target.isLunarCalendar, true);
     });
 
     test('create wish target without date', () {
@@ -92,6 +93,24 @@ void main() {
       expect(restored.isRecurring, original.isRecurring);
       expect(restored.hasNotification, original.hasNotification);
       expect(restored.notificationDaysBefore, original.notificationDaysBefore);
+    });
+
+    test('toMap and fromMap roundtrip with lunar calendar', () {
+      final original = CountdownTarget(
+        id: 'test-lunar',
+        name: '生日(农历)',
+        targetDate: DateTime(2025, 1, 1),
+        type: CountdownTargetType.birthday,
+        isLunarCalendar: true,
+        isRecurring: true,
+        createdAt: DateTime(2024, 1, 1),
+        updatedAt: DateTime(2024, 1, 1),
+      );
+
+      final map = original.toMap();
+      final restored = CountdownTarget.fromMap(map);
+
+      expect(restored.isLunarCalendar, true);
     });
 
     test('filter by type works correctly', () {
