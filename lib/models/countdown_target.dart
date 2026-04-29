@@ -9,6 +9,7 @@ class CountdownTarget {
   final String id;
   final String name;
   final DateTime? targetDate;
+  final DateTime? useDate; // 用户原始设置的日期，公历存公历日期，农历存农历月日（年份填用户设置值）
   final CountdownTargetType type;
   final bool isRecurring;
   final bool isLunarCalendar;
@@ -24,6 +25,7 @@ class CountdownTarget {
     required this.id,
     required this.name,
     this.targetDate,
+    this.useDate,
     required this.type,
     this.isRecurring = false,
     this.isLunarCalendar = false,
@@ -40,6 +42,7 @@ class CountdownTarget {
     String? id,
     String? name,
     DateTime? targetDate,
+    DateTime? useDate,
     CountdownTargetType? type,
     bool? isRecurring,
     bool? isLunarCalendar,
@@ -55,6 +58,7 @@ class CountdownTarget {
       id: id ?? this.id,
       name: name ?? this.name,
       targetDate: targetDate ?? this.targetDate,
+      useDate: useDate ?? this.useDate,
       type: type ?? this.type,
       isRecurring: isRecurring ?? this.isRecurring,
       isLunarCalendar: isLunarCalendar ?? this.isLunarCalendar,
@@ -73,6 +77,7 @@ class CountdownTarget {
       'id': id,
       'name': name,
       'target_date': targetDate?.millisecondsSinceEpoch,
+      'use_date': useDate?.millisecondsSinceEpoch,
       'type': type.name,
       'is_recurring': isRecurring ? 1 : 0,
       'is_lunar_calendar': isLunarCalendar ? 1 : 0,
@@ -92,6 +97,9 @@ class CountdownTarget {
       name: map['name'] as String,
       targetDate: map['target_date'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['target_date'] as int)
+          : null,
+      useDate: map['use_date'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['use_date'] as int)
           : null,
       type: CountdownTargetType.values.firstWhere(
         (e) => e.name == map['type'],
