@@ -33,7 +33,9 @@ class CountdownTargetsNotifier extends StateNotifier<List<CountdownTarget>> {
   Future<bool> addTarget(CountdownTarget target) async {
     try {
       await _db.insertCountdownTarget(target);
-      state = [...state, target];
+      final calculated = CountdownUtils.calculateTargetDate(target.useDate, target.isLunarCalendar);
+      final withTargetDate = target.copyWith(targetDate: calculated);
+      state = [...state, withTargetDate];
       Log.i(LogTag.provider, 'addTarget success: ${target.name}');
       return true;
     } catch (e) {
@@ -44,8 +46,10 @@ class CountdownTargetsNotifier extends StateNotifier<List<CountdownTarget>> {
 
   Future<bool> updateTarget(CountdownTarget target) async {
     try {
-      await _db.updateCountdownTarget(target);
-      state = state.map((t) => t.id == target.id ? target : t).toList();
+      final calculated = CountdownUtils.calculateTargetDate(target.useDate, target.isLunarCalendar);
+      final withTargetDate = target.copyWith(targetDate: calculated);
+      await _db.updateCountdownTarget(withTargetDate);
+      state = state.map((t) => t.id == target.id ? withTargetDate : t).toList();
       Log.i(LogTag.provider, 'updateTarget success: ${target.name}');
       return true;
     } catch (e) {
