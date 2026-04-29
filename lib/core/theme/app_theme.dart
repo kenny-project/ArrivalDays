@@ -5,7 +5,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.deepPurple,
+        seedColor: Colors.green,
         brightness: Brightness.light,
       ),
       appBarTheme: const AppBarTheme(
@@ -18,14 +18,14 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        indicatorColor: Colors.deepPurple.withValues(alpha: 0.2),
+        indicatorColor: Colors.green.withValues(alpha: 0.2),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
     );
@@ -35,7 +35,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.deepPurple,
+        seedColor: Colors.green,
         brightness: Brightness.dark,
       ),
       appBarTheme: const AppBarTheme(
@@ -48,14 +48,14 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        indicatorColor: Colors.deepPurple.withValues(alpha: 0.2),
+        indicatorColor: Colors.green.withValues(alpha: 0.2),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
     );
