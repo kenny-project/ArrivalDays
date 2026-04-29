@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/countdown_utils.dart';
 import '../../../shared/providers/user_settings_provider.dart';
+import '../../../shared/providers/life_timer_provider.dart';
 import '../providers/clock_provider.dart';
 
 class LifeTimerCard extends ConsumerWidget {
