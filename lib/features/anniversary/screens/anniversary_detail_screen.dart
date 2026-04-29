@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/countdown_utils.dart';
 import '../../../models/countdown_target.dart';
-import '../../../shared/providers/database_providers.dart';
+import '../../../shared/providers/countdown_targets_provider.dart';
 import '../../../shared/widgets/countdown_display.dart';
 import '../providers/anniversary_provider.dart';
 import '../widgets/anniversary_form.dart';

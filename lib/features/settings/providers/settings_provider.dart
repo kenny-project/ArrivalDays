@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/user_settings.dart';
-import '../../../shared/providers/database_providers.dart';
+import '../../../shared/providers/user_settings_provider.dart';
 import '../../../core/utils/logger.dart';
 
 final settingsViewModelProvider =

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/countdown_target.dart';
-import '../../../shared/providers/database_providers.dart';
+import '../../../shared/providers/user_settings_provider.dart';
+import '../../../shared/providers/countdown_targets_provider.dart';
 
 final tickerProvider = StateProvider<DateTime>((ref) => DateTime.now());
 

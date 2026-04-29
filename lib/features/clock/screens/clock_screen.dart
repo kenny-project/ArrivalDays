@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/widgets/countdown_item.dart';
-import '../../../shared/providers/database_providers.dart';
+import '../../../shared/providers/countdown_targets_provider.dart';
 import '../providers/clock_provider.dart';
 import '../widgets/life_timer_card.dart';
 import '../widgets/clock_section_header.dart';
