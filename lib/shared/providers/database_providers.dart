@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/database/database_helper.dart';
 import '../../core/utils/logger.dart';
+import '../../core/utils/countdown_utils.dart';
 import '../../models/user_settings.dart';
 import '../../models/countdown_target.dart';
 
@@ -64,7 +65,12 @@ class CountdownTargetsNotifier extends StateNotifier<List<CountdownTarget>> {
   }
 
   Future<void> _loadTargets() async {
-    state = await _db.getAllCountdownTargets();
+    final loaded = await _db.getAllCountdownTargets();
+    final calculated = loaded.map((t) {
+      final targetDate = CountdownUtils.calculateTargetDate(t.useDate, t.isLunarCalendar);
+      return t.copyWith(targetDate: targetDate);
+    }).toList();
+    state = calculated;
     Log.i(LogTag.provider, 'targets loaded: ${state.length}');
   }
 
