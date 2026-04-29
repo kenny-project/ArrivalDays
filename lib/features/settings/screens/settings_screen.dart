@@ -15,8 +15,15 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
+  void initState() {
+    super.initState();
+    // debug: Log.i(LogTag.ui, 'SettingsScreen initState');
+  }
+
+  @override
   Widget build(BuildContext context) {
     final settings = ref.watch(userSettingsProvider);
+    // debug: Log.i(LogTag.ui, 'SettingsScreen settings: ${settings?.birthDate}');
 
     return Scaffold(
       appBar: AppBar(

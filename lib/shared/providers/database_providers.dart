@@ -21,8 +21,21 @@ class UserSettingsNotifier extends StateNotifier<UserSettings?> {
   }
 
   Future<void> _loadSettings() async {
-    state = await _db.getUserSettings();
-    Log.i(LogTag.provider, 'settings loaded: ${state?.birthDate}');
+    final loaded = await _db.getUserSettings();
+    if (loaded != null) {
+      state = loaded;
+    } else {
+      // Create default settings if none exist
+      final defaultSettings = UserSettings(
+        id: 'default',
+        birthDate: DateTime(1990, 1, 1),
+        lifeExpectancy: 80,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      await _db.insertUserSettings(defaultSettings);
+      state = defaultSettings;
+    }
   }
 
   Future<bool> saveSettings(UserSettings settings) async {

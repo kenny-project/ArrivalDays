@@ -26,7 +26,11 @@
       "Read(//home/wmh/Android/Sdk/**)",
       "Bash(/home/wmh/Programs/flutter/bin/flutter devices *)",
       "Bash(/home/wmh/Programs/flutter/bin/flutter build *)",
-      "Bash(export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn)"
+      "Bash(export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn)",
+      "Bash(/home/wmh/Programs/flutter/bin/flutter analyze *)",
+      "Bash(adb install *)",
+      "Bash(/home/wmh/Programs/flutter/bin/flutter test *)",
+      "Bash(adb logcat *)"
     ]
   }
 }

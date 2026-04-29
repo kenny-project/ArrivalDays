@@ -28,8 +28,8 @@ class CountdownDisplay extends StatelessWidget {
 
     return Text(
       countdown.isOverdue
-          ? '已过${countdown.toDisplayString(showSeconds: showSeconds)}'
-          : '还差${countdown.toDisplayString(showSeconds: showSeconds)}',
+          ? '已过去${countdown.toMinimalDisplayString(showSeconds: showSeconds)}'
+          : '距离${countdown.toMinimalDisplayString(showSeconds: showSeconds)}',
       style: style ?? theme.textTheme.bodyMedium?.copyWith(
         color: countdown.isOverdue ? Colors.red : null,
       ),

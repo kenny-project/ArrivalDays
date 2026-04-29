@@ -23,10 +23,14 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    // debug: _tabController.addListener(_onTabChanged);
   }
+
+  // debug: void _onTabChanged() { Log.i(LogTag.ui, 'WishListScreen TabController changed: ${_tabController.index}'); }
 
   @override
   void dispose() {
+    // debug: Log.i(LogTag.ui, 'WishListScreen disposed');
     _scrollController.dispose();
     _tabController.dispose();
     super.dispose();

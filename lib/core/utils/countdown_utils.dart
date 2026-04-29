@@ -21,8 +21,10 @@ class CountdownDuration {
     final parts = <String>[];
     if (years > 0) parts.add('${years}年');
     if (months > 0 || years > 0) parts.add('${months}月');
-    parts.add('${days}天');
-    parts.add('${hours.toString().padLeft(2, '0')}时');
+    if (days > 0 || years > 0 || months > 0) parts.add('${days}天');
+    if (hours > 0 || years > 0 || months > 0 || days > 0) {
+      parts.add('${hours.toString().padLeft(2, '0')}时');
+    }
     parts.add('${minutes.toString().padLeft(2, '0')}分');
     if (showSeconds) {
       parts.add('${seconds.toString().padLeft(2, '0')}秒');
@@ -34,10 +36,48 @@ class CountdownDuration {
     final parts = <String>[];
     if (years > 0) parts.add('${years}年');
     if (months > 0 || years > 0) parts.add('${months}月');
-    parts.add('${days}天');
-    parts.add('${hours.toString().padLeft(2, '0')}时');
+    if (days > 0 || years > 0 || months > 0) parts.add('${days}天');
+    if (hours > 0 || years > 0 || months > 0 || days > 0) {
+      parts.add('${hours.toString().padLeft(2, '0')}时');
+    }
     parts.add('${minutes.toString().padLeft(2, '0')}分');
     return parts.join('');
+  }
+
+    String toMinimalDisplayString({bool showSeconds = true}) {
+    if (years > 0) {
+      String result = '${years}年';
+      if (months > 0) result += '${months}月';
+      if (days > 0) result += '${days}天';
+      if (months == 0) {
+        if (hours > 0) result += '${hours}时';
+        if (minutes > 0) result += '${minutes}分';
+        if (showSeconds && seconds > 0) result += '${seconds}秒';
+      }
+      return result;
+    }
+    if (months > 0) {
+      String result = '${months}月';
+      if (days > 0) result += '${days}天';
+      if (days == 0) {
+        if (hours > 0) result += '${hours}时';
+        if (minutes > 0) result += '${minutes}分';
+      }
+      return result;
+    }
+    if (days > 0) {
+      String result = '${days}天';
+      if (hours > 0) result += '${hours}时';
+      if (minutes > 0) result += '${minutes}分';
+      return result;
+    }
+    if (hours > 0) {
+      String result = '${hours}小时';
+      if (minutes > 0) result += '${minutes}分';
+      return result;
+    }
+    if (minutes > 0) return '${minutes}分钟';
+    return '即将到来';
   }
 }
 

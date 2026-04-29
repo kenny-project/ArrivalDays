@@ -17,7 +17,14 @@ class _AnniversaryListScreenState extends ConsumerState<AnniversaryListScreen> {
   final ScrollController _scrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    // debug: Log.i(LogTag.ui, 'AnniversaryListScreen initState');
+  }
+
+  @override
   void dispose() {
+    // debug: Log.i(LogTag.ui, 'AnniversaryListScreen disposed');
     _scrollController.dispose();
     super.dispose();
   }

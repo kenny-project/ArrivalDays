@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -5,6 +6,7 @@ import 'l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'shared/providers/database_providers.dart';
 import 'features/clock/screens/clock_screen.dart';
+import 'features/clock/providers/clock_provider.dart';
 import 'features/anniversary/screens/anniversary_list_screen.dart';
 import 'features/wish/screens/wish_list_screen.dart';
 import 'features/settings/screens/settings_screen.dart';
@@ -39,20 +41,63 @@ class ArrivalDaysApp extends ConsumerWidget {
   }
 }
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _startTimerIfNeeded();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _startTimerIfNeeded();
+    } else if (state == AppLifecycleState.paused) {
+      _stopTimer();
+    }
+  }
+
+  void _startTimerIfNeeded() {
+    if (_currentIndex == 0) {
+      _timer?.cancel();
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+        ref.read(tickerProvider.notifier).state = DateTime.now();
+      });
+    }
+  }
+
+  void _stopTimer() {
+    _timer?.cancel();
+    _timer = null;
+  }
 
   void _navigateToTab(int index) {
     setState(() {
       _currentIndex = index;
     });
+    if (index == 0) {
+      _startTimerIfNeeded();
+    } else {
+      _stopTimer();
+    }
   }
 
   @override
@@ -61,9 +106,9 @@ class _MainScreenState extends State<MainScreen> {
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          ClockScreen(
-            onNavigateToAnniversary: () => _navigateToTab(1),
-            onNavigateToWish: () => _navigateToTab(2),
+          const ClockScreen(
+            onNavigateToAnniversary: null,
+            onNavigateToWish: null,
           ),
           const AnniversaryListScreen(),
           const WishListScreen(),
@@ -73,9 +118,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          _navigateToTab(index);
         },
         destinations: const [
           NavigationDestination(

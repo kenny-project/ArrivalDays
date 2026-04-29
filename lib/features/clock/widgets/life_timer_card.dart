@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/countdown_utils.dart';
-import '../../../core/utils/logger.dart';
 import '../../../shared/providers/database_providers.dart';
 import '../providers/clock_provider.dart';
 
@@ -13,7 +12,7 @@ class LifeTimerCard extends ConsumerWidget {
     final lifeTimer = ref.watch(lifeTimerProvider);
     final settings = ref.watch(userSettingsProvider);
     final retirementDate = ref.watch(retirementTimerProvider);
-    Log.i(LogTag.ui, 'LifeTimerCard build - lifeTimer: ${lifeTimer?.targetDate}, retirementDate: $retirementDate');
+    // debug: Log.i(LogTag.ui, 'LifeTimerCard build - lifeTimer: ${lifeTimer?.targetDate}, retirementDate: $retirementDate');
     final theme = Theme.of(context);
 
     return Card(
@@ -80,8 +79,8 @@ class LifeTimerCard extends ConsumerWidget {
         ),
         Text(
           isOverdue
-              ? '已过${countdown.toDisplayString()}'
-              : '还差${countdown.toDisplayString()}',
+              ? '已过去${countdown.toMinimalDisplayString()}'
+              : countdown.toMinimalDisplayString(),
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: isOverdue ? Colors.red : theme.colorScheme.primary,
@@ -100,7 +99,7 @@ class LifeTimerCard extends ConsumerWidget {
     return Row(
       children: [
         Text(
-          '已过: ',
+          '已过去: ',
           style: theme.textTheme.bodyMedium,
         ),
         Text(
