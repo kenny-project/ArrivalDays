@@ -80,8 +80,8 @@ class LifeTimerCard extends ConsumerWidget {
         ),
         Text(
           isOverdue
-              ? '已过去${countdown.toMinimalDisplayString()}'
-              : countdown.toMinimalDisplayString(),
+              ? '已过去${countdown.toDisplayString()}'
+              : countdown.toDisplayString(),
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: isOverdue ? Colors.red : theme.colorScheme.primary,
