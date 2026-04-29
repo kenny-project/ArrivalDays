@@ -65,8 +65,12 @@ class CountdownItem extends StatelessWidget {
     final countdown = CountdownUtils.calculateCountdown(displayTarget);
 
     if (target.type == CountdownTargetType.birthday) {
-      final age = CountdownUtils.calculateAge(target.targetDate!);
-      return '$age岁 ${countdown.isOverdue ? '已过去' : '距离'}${countdown.toMinimalDisplayString()}';
+      if (target.isLunarCalendar) {
+        return '${countdown.isOverdue ? '已过去' : '距离生日还有'}${countdown.toMinimalDisplayString()}';
+      } else {
+        final age = CountdownUtils.calculateAge(target.targetDate!);
+        return '今年${age}周岁 ${countdown.isOverdue ? '已过去' : '距离生日还有'}${countdown.toMinimalDisplayString()}';
+      }
     }
 
     return countdown.isOverdue
