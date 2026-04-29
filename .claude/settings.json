@@ -30,7 +30,10 @@
       "Bash(/home/wmh/Programs/flutter/bin/flutter analyze *)",
       "Bash(adb install *)",
       "Bash(/home/wmh/Programs/flutter/bin/flutter test *)",
-      "Bash(adb logcat *)"
+      "Bash(adb logcat *)",
+      "Bash(git check-ignore *)",
+      "Bash(git commit *)",
+      "WebSearch"
     ]
   }
 }
