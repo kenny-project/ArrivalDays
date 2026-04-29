@@ -42,6 +42,17 @@ class CountdownItem extends StatelessWidget {
     return target.name;
   }
 
+  String _formatDisplayDate(CountdownTarget target) {
+    final date = target.useDate ?? target.targetDate;
+    if (date == null) return '';
+
+    final dateStr = '${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    if (target.isLunarCalendar) {
+      return '$dateStr(农历)';
+    }
+    return dateStr;
+  }
+
   String get _countdownText {
     if (target.targetDate == null) {
       return '无日期';
@@ -86,7 +97,7 @@ class CountdownItem extends StatelessWidget {
       },
       child: ListTile(
         leading: Icon(_icon, color: isBirthday ? Colors.pink : theme.colorScheme.primary),
-        title: Text(_displayName),
+        title: Text('${_displayName}（${_formatDisplayDate(target)}）'),
         subtitle: Text(
           _countdownText,
           style: TextStyle(

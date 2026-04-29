@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/user_settings.dart';
-import '../../../shared/providers/database_providers.dart';
+import '../../../shared/providers/user_settings_provider.dart';
 import '../../../core/services/export_service.dart';
 import '../providers/settings_provider.dart';
 import 'notification_settings_screen.dart';

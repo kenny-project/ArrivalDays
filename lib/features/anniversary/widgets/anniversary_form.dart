@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../../../models/countdown_target.dart';
+import '../../../core/utils/countdown_utils.dart';
 
 class AnniversaryForm extends StatefulWidget {
   final CountdownTarget? target;
@@ -19,7 +20,6 @@ class AnniversaryForm extends StatefulWidget {
 class _AnniversaryFormState extends State<AnniversaryForm> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
-  late TextEditingController _relationController;
   DateTime? _selectedDate;
   bool _isBirthday = false;
   bool _isRecurring = true;
@@ -30,8 +30,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.target?.name ?? '');
-    _relationController = TextEditingController(text: widget.target?.relation ?? '');
-    _selectedDate = widget.target?.targetDate;
+    _selectedDate = widget.target?.useDate;
     _isBirthday = widget.target?.type == CountdownTargetType.birthday;
     _isRecurring = widget.target?.isRecurring ?? true;
     _isLunarCalendar = widget.target?.isLunarCalendar ?? false;
@@ -41,7 +40,6 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
   @override
   void dispose() {
     _nameController.dispose();
-    _relationController.dispose();
     super.dispose();
   }
 
@@ -102,17 +100,6 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
                 ],
               ),
               const SizedBox(height: 16),
-              if (_isBirthday) ...[
-                TextFormField(
-                  controller: _relationController,
-                  decoration: const InputDecoration(
-                    labelText: '关系（可选）',
-                    border: OutlineInputBorder(),
-                    hintText: '如：爸爸、妈妈、朋友',
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('日期'),
@@ -148,6 +135,17 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
                     });
                   },
                   controlAffinity: ListTileControlAffinity.leading,
+                ),
+              ],
+              if (_isLunarCalendar) ...[
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('生肖'),
+                  subtitle: Text(
+                    _selectedDate != null
+                        ? '属${CountdownUtils.calculateZodiac(_selectedDate!.year)}'
+                        : '选择日期后显示',
+                  ),
                 ),
               ],
               SwitchListTile(
@@ -201,11 +199,10 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
       final target = CountdownTarget(
         id: widget.target?.id ?? const Uuid().v4(),
         name: _nameController.text,
-        targetDate: _selectedDate,
+        useDate: _selectedDate,
         type: _isBirthday ? CountdownTargetType.birthday : CountdownTargetType.anniversary,
         isRecurring: _isRecurring,
         isLunarCalendar: _isBirthday ? _isLunarCalendar : false,
-        relation: _isBirthday ? _relationController.text : null,
         hasNotification: _hasNotification,
         createdAt: widget.target?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),

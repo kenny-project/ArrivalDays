@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/countdown_target.dart';
 import '../../../shared/widgets/countdown_item.dart';
 import '../../../shared/widgets/empty_state.dart';
-import '../../../shared/providers/database_providers.dart';
+import '../../../shared/providers/countdown_targets_provider.dart';
 import '../providers/wish_provider.dart';
 import '../widgets/wish_form.dart';
 

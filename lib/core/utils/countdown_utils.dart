@@ -82,6 +82,77 @@ class CountdownDuration {
 }
 
 class CountdownUtils {
+  static final Map<int, List<int>> _lunarYearData = {
+    // year: [chineseNewYearMonth, chineseNewYearDay, daysInYear]
+    // This is a simplified table - more accurate data would be needed for production
+    2026: [2, 17, 0],
+    2025: [1, 29, 0],
+    2024: [2, 10, 0],
+    2023: [1, 22, 0],
+    2022: [2, 1, 0],
+    2021: [2, 12, 0],
+    2020: [1, 25, 0],
+    2019: [2, 5, 0],
+    2018: [2, 16, 0],
+    2017: [1, 28, 0],
+    2016: [2, 8, 0],
+    2015: [2, 19, 0],
+    2014: [1, 31, 0],
+    2013: [2, 10, 0],
+    2012: [1, 23, 0],
+    2011: [2, 3, 0],
+    2010: [2, 14, 0],
+    2009: [1, 26, 0],
+    2008: [2, 7, 0],
+    2007: [2, 18, 0],
+    2006: [1, 29, 0],
+    2005: [2, 9, 0],
+    2004: [1, 22, 0],
+    2003: [2, 1, 0],
+    2002: [2, 12, 0],
+    2001: [1, 24, 0],
+    2000: [2, 5, 0],
+  };
+
+  static DateTime convertLunarToSolar(int targetYear, int lunarMonth, int lunarDay) {
+    // Find the closest Chinese New Year data for targetYear
+    if (!_lunarYearData.containsKey(targetYear)) {
+      // Estimate if year not in table - use Feb 1 as default
+      return DateTime(targetYear, lunarMonth + 1, lunarDay);
+    }
+
+    final cnyData = _lunarYearData[targetYear]!;
+    final cnyMonth = cnyData[0];
+    final cnyDay = cnyData[1];
+
+    // Calculate days from Chinese New Year
+    final cnyThisYear = DateTime(targetYear, cnyMonth, cnyDay);
+    // Approximate: each lunar month is ~29.5 days
+    int daysFromCny = ((lunarMonth - 1) * 29.5).round() + lunarDay - 1;
+
+    return cnyThisYear.add(Duration(days: daysFromCny));
+  }
+
+  static String calculateZodiac(int year) {
+    final zodiacs = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+    final baseYear = 1990;
+    final baseIndex = 6; // 马
+    final offset = (year - baseYear) % 12;
+    final index = (baseIndex + offset + 12) % 12;
+    return zodiacs[index];
+  }
+
+  static DateTime? calculateTargetDate(DateTime? useDate, bool isLunarCalendar) {
+    if (useDate == null) return null;
+
+    if (isLunarCalendar) {
+      final now = DateTime.now();
+      return convertLunarToSolar(now.year, useDate.month, useDate.day);
+    } else {
+      return useDate;
+    }
+  }
+
   static CountdownDuration calculateCountdown(DateTime targetDate) {
     final now = DateTime.now();
     final difference = targetDate.difference(now);
