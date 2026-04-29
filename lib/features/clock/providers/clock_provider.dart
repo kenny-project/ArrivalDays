@@ -2,18 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/countdown_target.dart';
 import '../../../shared/providers/user_settings_provider.dart';
 import '../../../shared/providers/countdown_targets_provider.dart';
+import 'ticker_provider.dart';
 
-final tickerProvider = StateProvider<DateTime>((ref) => DateTime.now());
-
-final lifeTimerProvider = Provider<CountdownTarget?>((ref) {
-  ref.watch(tickerProvider);
-  final targets = ref.watch(countdownTargetsProvider);
-  try {
-    return targets.firstWhere((t) => t.type == CountdownTargetType.lifeTimer);
-  } catch (_) {
-    return null;
-  }
-});
+export 'ticker_provider.dart';
 
 final retirementTimerProvider = Provider<DateTime?>((ref) {
   ref.watch(tickerProvider);
