@@ -4,6 +4,148 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/auth_service.dart';
 import '../../auth/providers/auth_provider.dart';
 
+/// Standalone PIN input page — avoids showDialog widget tree issues on Android 16
+class PinInputPage extends StatefulWidget {
+  final String title;
+
+  const PinInputPage({super.key, required this.title});
+
+  @override
+  State<PinInputPage> createState() => _PinInputPageState();
+}
+
+class _PinInputPageState extends State<PinInputPage> {
+  final List<int> _pin = [];
+
+  void _onDigitPressed(int digit) {
+    if (_pin.length >= 6) return;
+    setState(() => _pin.add(digit));
+    HapticFeedback.lightImpact();
+    if (_pin.length == 6) {
+      // Auto-submit after short delay so user sees the last dot
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) Navigator.pop(context, _pin.join());
+      });
+    }
+  }
+
+  void _onBackspace() {
+    if (_pin.isNotEmpty) {
+      setState(() => _pin.removeLast());
+      HapticFeedback.lightImpact();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.title)),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const Spacer(flex: 2),
+            // PIN dots
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(6, (index) {
+                final filled = index < _pin.length;
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: filled
+                        ? theme.colorScheme.primary
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: theme.colorScheme.outline,
+                      width: 2,
+                    ),
+                  ),
+                );
+              }),
+            ),
+            const Spacer(flex: 1),
+            // Number pad
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48),
+              child: Column(
+                children: [
+                  for (final row in [
+                    [1, 2, 3],
+                    [4, 5, 6],
+                    [7, 8, 9],
+                    [-1, 0, -2],
+                  ])
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: row.map((digit) {
+                          if (digit == -1) {
+                            return const SizedBox(width: 72);
+                          }
+                          if (digit == -2) {
+                            return SizedBox(
+                              width: 72,
+                              height: 72,
+                              child: IconButton(
+                                onPressed: _onBackspace,
+                                icon: const Icon(Icons.backspace_outlined),
+                              ),
+                            );
+                          }
+                          return SizedBox(
+                            width: 72,
+                            height: 72,
+                            child: TextButton(
+                              onPressed: () => _onDigitPressed(digit),
+                              style: TextButton.styleFrom(
+                                shape: const CircleBorder(),
+                                textStyle: const TextStyle(fontSize: 24),
+                              ),
+                              child: Text('$digit'),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Confirm dialog using showDialog — simpler, less likely to conflict
+Future<bool> _showConfirmDialog(BuildContext context,
+    {required String title, required String content}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text('取消'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: const Text('确定'),
+        ),
+      ],
+    ),
+  );
+  return result ?? false;
+}
+
 class PasswordSettingsScreen extends ConsumerStatefulWidget {
   const PasswordSettingsScreen({super.key});
 
@@ -50,7 +192,6 @@ class _PasswordSettingsScreenState
           : ListView(
               children: [
                 if (!_hasPin) ...[
-                  // No PIN set - show setup
                   ListTile(
                     leading: const Icon(Icons.lock_outline),
                     title: const Text('设置密码'),
@@ -58,7 +199,6 @@ class _PasswordSettingsScreenState
                     onTap: _setupPin,
                   ),
                 ] else ...[
-                  // PIN is set - show management options
                   ListTile(
                     leading: const Icon(Icons.lock),
                     title: const Text('已设置密码'),
@@ -93,34 +233,41 @@ class _PasswordSettingsScreenState
     );
   }
 
-  Future<void> _setupPin() async {
-    final pin = await _showPinInput('设置密码');
-    if (pin == null) return;
+  /// Navigate to PIN input page, returns the 6-digit PIN or null
+  Future<String?> _navigateToPinInput(String title) async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => PinInputPage(title: title)),
+    );
+    return result;
+  }
 
-    final confirm = await _showPinInput('确认密码');
-    if (confirm == null) return;
+  Future<void> _setupPin() async {
+    final pin = await _navigateToPinInput('设置密码');
+    if (pin == null || !mounted) return;
+
+    final confirm = await _navigateToPinInput('确认密码');
+    if (confirm == null || !mounted) return;
 
     if (pin != confirm) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('两次输入的密码不一致')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('两次输入的密码不一致')),
+      );
       return;
     }
 
-    await ref.read(authViewModelProvider).savePin(pin);
+    await AuthService.instance.savePin(pin);
 
     if (mounted) {
       setState(() => _hasPin = true);
-      _askEnableBiometric();
+      await _askEnableBiometric();
+      ref.invalidate(hasPinProvider);
     }
   }
 
   Future<void> _changePin() async {
-    // Verify old PIN first
-    final oldPin = await _showPinInput('验证当前密码');
-    if (oldPin == null) return;
+    final oldPin = await _navigateToPinInput('验证当前密码');
+    if (oldPin == null || !mounted) return;
 
     final correct = await AuthService.instance.verifyPin(oldPin);
     if (!correct) {
@@ -132,18 +279,16 @@ class _PasswordSettingsScreenState
       return;
     }
 
-    final newPin = await _showPinInput('设置新密码');
-    if (newPin == null) return;
+    final newPin = await _navigateToPinInput('设置新密码');
+    if (newPin == null || !mounted) return;
 
-    final confirm = await _showPinInput('确认新密码');
-    if (confirm == null) return;
+    final confirm = await _navigateToPinInput('确认新密码');
+    if (confirm == null || !mounted) return;
 
     if (newPin != confirm) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('两次输入的密码不一致')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('两次输入的密码不一致')),
+      );
       return;
     }
 
@@ -157,9 +302,8 @@ class _PasswordSettingsScreenState
   }
 
   Future<void> _disablePin() async {
-    // Verify identity first
     final success = await _verifyIdentity();
-    if (!success) return;
+    if (!success || !mounted) return;
 
     await ref.read(authViewModelProvider).clearPin();
 
@@ -176,11 +320,17 @@ class _PasswordSettingsScreenState
 
   Future<void> _toggleBiometric(bool enabled) async {
     if (enabled) {
-      // Verify identity before enabling
       final success = await AuthService.instance.authenticateWithBiometric(
         reason: '验证身份以启用生物识别',
       );
-      if (!success) return;
+      if (!success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('生物识别验证失败，请确认已录入指纹/面容')),
+          );
+        }
+        return;
+      }
     }
 
     await ref.read(authViewModelProvider).setBiometricEnabled(enabled);
@@ -191,7 +341,6 @@ class _PasswordSettingsScreenState
   }
 
   Future<bool> _verifyIdentity() async {
-    // Try biometric first if enabled
     if (_biometricEnabled && _canCheckBiometrics) {
       final success = await AuthService.instance.authenticateWithBiometric(
         reason: '验证身份',
@@ -199,28 +348,27 @@ class _PasswordSettingsScreenState
       if (success) return true;
     }
 
-    // Fall back to PIN
-    final pin = await _showPinInput('验证密码');
+    final pin = await _navigateToPinInput('验证密码');
     if (pin == null) return false;
 
     return await AuthService.instance.verifyPin(pin);
   }
 
   Future<void> _askEnableBiometric() async {
-    if (!_canCheckBiometrics) return;
+    if (!_canCheckBiometrics || !mounted) return;
 
     final enable = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('启用生物识别？'),
         content: const Text('是否使用指纹/面容快速解锁应用？'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(ctx, false),
             child: const Text('跳过'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(ctx, true),
             child: const Text('启用'),
           ),
         ],
@@ -230,51 +378,5 @@ class _PasswordSettingsScreenState
     if (enable == true) {
       await _toggleBiometric(true);
     }
-  }
-
-  /// Show a 6-digit PIN input dialog. Returns the PIN string or null if cancelled.
-  Future<String?> _showPinInput(String title) async {
-    final controller = TextEditingController();
-    final result = await showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          maxLength: 6,
-          obscureText: true,
-          autofocus: true,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 24, letterSpacing: 12),
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: const InputDecoration(
-            counterText: '',
-            hintText: '······',
-          ),
-          onSubmitted: (value) {
-            if (value.length == 6) Navigator.pop(context, value);
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () {
-              final text = controller.text;
-              if (text.length == 6) {
-                Navigator.pop(context, text);
-              }
-            },
-            child: const Text('确定'),
-          ),
-        ],
-      ),
-    );
-    controller.dispose();
-    return result;
   }
 }

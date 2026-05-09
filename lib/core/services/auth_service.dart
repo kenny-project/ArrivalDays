@@ -39,7 +39,9 @@ class AuthService {
   Future<bool> canCheckBiometrics() async {
     if (kIsWeb) return false;
     try {
-      return await _localAuth.canCheckBiometrics;
+      final result = await _localAuth.canCheckBiometrics;
+      Log.i(LogTag.settings, 'canCheckBiometrics: $result');
+      return result;
     } catch (e) {
       Log.e(LogTag.settings, 'canCheckBiometrics error: $e');
       return false;
@@ -50,13 +52,16 @@ class AuthService {
   Future<bool> authenticateWithBiometric({String reason = '验证身份以解锁应用'}) async {
     if (kIsWeb) return false;
     try {
-      return await _localAuth.authenticate(
+      Log.i(LogTag.settings, 'authenticateWithBiometric: starting, reason=$reason');
+      final result = await _localAuth.authenticate(
         localizedReason: reason,
         options: const AuthenticationOptions(
           stickyAuth: true,
           useErrorDialogs: true,
         ),
       );
+      Log.i(LogTag.settings, 'authenticateWithBiometric: result=$result');
+      return result;
     } catch (e) {
       Log.e(LogTag.settings, 'biometric auth error: $e');
       return false;
