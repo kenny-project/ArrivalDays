@@ -101,7 +101,11 @@ class CountdownItem extends StatelessWidget {
       },
       child: ListTile(
         leading: Icon(_icon, color: isBirthday ? Colors.pink : theme.colorScheme.primary),
-        title: Text('${_displayName}（${_formatDisplayDate(target)}）'),
+        title: Text(
+          _formatDisplayDate(target).isEmpty
+              ? _displayName
+              : '$_displayName（${_formatDisplayDate(target)}）',
+        ),
         subtitle: Text(
           _countdownText,
           style: TextStyle(

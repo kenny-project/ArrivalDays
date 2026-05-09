@@ -195,19 +195,28 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
   }
 
   Future<void> _save() async {
-    if (_formKey.currentState!.validate() && _selectedDate != null) {
-      final target = CountdownTarget(
-        id: widget.target?.id ?? const Uuid().v4(),
-        name: _nameController.text,
-        useDate: _selectedDate,
-        type: _isBirthday ? CountdownTargetType.birthday : CountdownTargetType.anniversary,
-        isRecurring: _isRecurring,
-        isLunarCalendar: _isBirthday ? _isLunarCalendar : false,
-        hasNotification: _hasNotification,
-        createdAt: widget.target?.createdAt ?? DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
-      await widget.onSave(target);
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedDate == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('请选择日期')),
+        );
+      }
+      return;
     }
+
+    final target = CountdownTarget(
+      id: widget.target?.id ?? const Uuid().v4(),
+      name: _nameController.text,
+      useDate: _selectedDate,
+      type: _isBirthday ? CountdownTargetType.birthday : CountdownTargetType.anniversary,
+      isRecurring: _isRecurring,
+      isLunarCalendar: _isBirthday ? _isLunarCalendar : false,
+      hasNotification: _hasNotification,
+      createdAt: widget.target?.createdAt ?? DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    await widget.onSave(target);
   }
 }
