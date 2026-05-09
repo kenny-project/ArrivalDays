@@ -5,6 +5,12 @@ import '../../../shared/providers/user_settings_provider.dart';
 import '../../../core/services/export_service.dart';
 import '../providers/settings_provider.dart';
 import 'notification_settings_screen.dart';
+import 'password_settings_screen.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../../../core/services/auth_service.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart' show join;
+import '../../../shared/providers/countdown_targets_provider.dart' hide databaseHelperProvider;
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -72,6 +78,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   subtitle: Text(settings.language == 'zh' ? '中文' : 'English'),
                   onTap: _selectLanguage,
                 ),
+                ListTile(
+                  leading: const Icon(Icons.lock),
+                  title: const Text('登录密码'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PasswordSettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
                 const Divider(),
                 _buildSectionHeader('功能'),
                 ListTile(
@@ -119,6 +138,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       );
                     }
                   },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete_forever, color: Colors.red),
+                  title: const Text('数据重置', style: TextStyle(color: Colors.red)),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _resetData(context),
                 ),
                 const Divider(),
                 _buildSectionHeader('关于'),
@@ -224,6 +249,106 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
     if (result != null) {
       ref.read(settingsViewModelProvider).updateLanguage(result);
+    }
+  }
+
+  Future<void> _resetData(BuildContext context) async {
+    // Verify identity if PIN is set
+    final hasPin = await AuthService.instance.hasPin();
+    if (hasPin) {
+      final biometricEnabled = await AuthService.instance.isBiometricEnabled();
+      bool verified = false;
+
+      if (biometricEnabled) {
+        verified = await AuthService.instance.authenticateWithBiometric(
+          reason: '验证身份以重置数据',
+        );
+      }
+
+      if (!verified) {
+        if (!context.mounted) return;
+        final controller = TextEditingController();
+        final pin = await showDialog<String>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('验证密码'),
+            content: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              obscureText: true,
+              autofocus: true,
+              textAlign: TextAlign.center,
+              decoration: const InputDecoration(counterText: ''),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('取消'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, controller.text),
+                child: const Text('确定'),
+              ),
+            ],
+          ),
+        );
+        controller.dispose();
+
+        if (pin == null) return;
+        verified = await AuthService.instance.verifyPin(pin);
+        if (!verified) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('密码错误')),
+            );
+          }
+          return;
+        }
+      }
+    }
+
+    // Second confirmation
+    if (!context.mounted) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('确定要清除所有数据吗？'),
+        content: const Text('此操作不可恢复，所有设置和倒计时数据将被删除。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('确定', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    // Reset all data
+    await ref.read(authViewModelProvider).resetAllData();
+
+    // Reset database
+    final db = ref.read(databaseHelperProvider);
+    await db.close();
+    // Delete database file and reinitialize
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'arrival_days.db');
+    await deleteDatabase(path);
+
+    // Reload settings
+    ref.invalidate(userSettingsProvider);
+    ref.invalidate(countdownTargetsProvider);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('数据已重置')),
+      );
     }
   }
 }
