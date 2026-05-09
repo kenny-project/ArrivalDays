@@ -80,6 +80,25 @@ class AppLocalizations {
       'workedYears': 'Years worked',
       'relation': 'Relation',
       'noDate': 'No date',
+      'loginPassword': 'Login Password',
+      'dataReset': 'Reset Data',
+      'setPassword': 'Set Password',
+      'changePassword': 'Change Password',
+      'disablePassword': 'Disable Password',
+      'biometricUnlock': 'Biometric Unlock',
+      'pinMismatch': 'PINs do not match',
+      'pinIncorrect': 'Incorrect PIN',
+      'passwordSet': 'Password set',
+      'passwordChanged': 'Password changed',
+      'passwordDisabled': 'Password disabled',
+      'verifyIdentity': 'Verify Identity',
+      'enableBiometric': 'Enable Biometric?',
+      'enableBiometricDesc': 'Use fingerprint/face to quickly unlock?',
+      'skip': 'Skip',
+      'enable': 'Enable',
+      'resetConfirmTitle': 'Delete all data?',
+      'resetConfirmDesc': 'This cannot be undone. All settings and countdown data will be deleted.',
+      'dataResetDone': 'Data has been reset',
     },
     'zh': {
       'appTitle': '人生倒计时',
@@ -132,6 +151,25 @@ class AppLocalizations {
       'workedYears': '已工作',
       'relation': '关系',
       'noDate': '无日期',
+      'loginPassword': '登录密码',
+      'dataReset': '数据重置',
+      'setPassword': '设置密码',
+      'changePassword': '修改密码',
+      'disablePassword': '关闭密码',
+      'biometricUnlock': '指纹/面容解锁',
+      'pinMismatch': '两次输入的密码不一致',
+      'pinIncorrect': '密码错误',
+      'passwordSet': '密码已设置',
+      'passwordChanged': '密码已修改',
+      'passwordDisabled': '密码已关闭',
+      'verifyIdentity': '验证身份',
+      'enableBiometric': '启用生物识别？',
+      'enableBiometricDesc': '是否使用指纹/面容快速解锁应用？',
+      'skip': '跳过',
+      'enable': '启用',
+      'resetConfirmTitle': '确定要清除所有数据吗？',
+      'resetConfirmDesc': '此操作不可恢复，所有设置和倒计时数据将被删除。',
+      'dataResetDone': '数据已重置',
     },
   };
 
@@ -175,6 +213,25 @@ class AppLocalizations {
   String get age => translate('age');
   String get relation => translate('relation');
   String get noDate => translate('noDate');
+  String get loginPassword => translate('loginPassword');
+  String get dataReset => translate('dataReset');
+  String get setPassword => translate('setPassword');
+  String get changePassword => translate('changePassword');
+  String get disablePassword => translate('disablePassword');
+  String get biometricUnlock => translate('biometricUnlock');
+  String get pinMismatch => translate('pinMismatch');
+  String get pinIncorrect => translate('pinIncorrect');
+  String get passwordSet => translate('passwordSet');
+  String get passwordChanged => translate('passwordChanged');
+  String get passwordDisabled => translate('passwordDisabled');
+  String get verifyIdentity => translate('verifyIdentity');
+  String get enableBiometric => translate('enableBiometric');
+  String get enableBiometricDesc => translate('enableBiometricDesc');
+  String get skip => translate('skip');
+  String get enable => translate('enable');
+  String get resetConfirmTitle => translate('resetConfirmTitle');
+  String get resetConfirmDesc => translate('resetConfirmDesc');
+  String get dataResetDone => translate('dataResetDone');
 }
 
 class _AppLocalizationsDelegate
