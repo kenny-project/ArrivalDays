@@ -4,12 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
+import 'core/services/auth_service.dart';
 import 'shared/providers/user_settings_provider.dart';
 import 'features/clock/providers/clock_provider.dart';
 import 'features/clock/screens/clock_screen.dart';
 import 'features/anniversary/screens/anniversary_list_screen.dart';
 import 'features/wish/screens/wish_list_screen.dart';
 import 'features/settings/screens/settings_screen.dart';
+import 'features/auth/screens/lock_screen.dart';
+import 'features/auth/providers/auth_provider.dart';
 
 class ArrivalDaysApp extends ConsumerWidget {
   const ArrivalDaysApp({super.key});
@@ -18,6 +21,7 @@ class ArrivalDaysApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(userSettingsProvider);
     final isDarkMode = settings?.isDarkMode ?? false;
+    final isAuthenticated = ref.watch(isAuthenticatedProvider);
 
     return MaterialApp(
       title: 'ArrivalDays',
@@ -36,7 +40,13 @@ class ArrivalDaysApp extends ConsumerWidget {
         Locale('zh'),
       ],
       locale: Locale(settings?.language ?? 'zh'),
-      home: const MainScreen(),
+      home: isAuthenticated
+          ? const MainScreen()
+          : LockScreen(
+              onAuthenticated: () {
+                ref.read(isAuthenticatedProvider.notifier).state = true;
+              },
+            ),
     );
   }
 }
