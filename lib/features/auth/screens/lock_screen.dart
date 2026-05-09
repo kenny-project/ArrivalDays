@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/utils/logger.dart';
-import '../providers/auth_provider.dart';
 
 class LockScreen extends ConsumerStatefulWidget {
   final VoidCallback onAuthenticated;

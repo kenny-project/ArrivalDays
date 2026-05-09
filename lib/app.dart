@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
-import 'core/services/auth_service.dart';
 import 'shared/providers/user_settings_provider.dart';
 import 'features/clock/providers/clock_provider.dart';
 import 'features/clock/screens/clock_screen.dart';
