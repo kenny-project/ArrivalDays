@@ -25,6 +25,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
   bool _isRecurring = true;
   bool _isLunarCalendar = false;
   bool _hasNotification = true;
+  bool _showDateError = false;
 
   @override
   void initState() {
@@ -111,6 +112,17 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
                 trailing: const Icon(Icons.calendar_today),
                 onTap: _selectDate,
               ),
+              if (_showDateError && _selectedDate == null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, top: 4),
+                  child: Text(
+                    '请选择日期',
+                    style: TextStyle(
+                      color: theme.colorScheme.error,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 16),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
@@ -190,6 +202,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
     if (date != null) {
       setState(() {
         _selectedDate = date;
+        _showDateError = false;
       });
     }
   }
@@ -198,11 +211,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedDate == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('请选择日期')),
-        );
-      }
+      setState(() => _showDateError = true);
       return;
     }
 
