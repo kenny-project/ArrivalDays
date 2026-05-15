@@ -38,7 +38,21 @@ class ArrivalDaysApp extends ConsumerWidget {
         Locale('en'),
         Locale('zh'),
       ],
-      locale: Locale(settings?.language ?? 'zh'),
+      localeResolutionCallback: (locale, supportedLocales) {
+        if (settings?.language != 'system' && settings?.language != null) {
+          return Locale(settings!.language);
+        }
+        // Follow system locale
+        for (final supported in supportedLocales) {
+          if (supported.languageCode == locale?.languageCode) {
+            return supported;
+          }
+        }
+        return supportedLocales.first;
+      },
+      locale: (settings?.language == 'system' || settings?.language == null)
+          ? null
+          : Locale(settings!.language),
       home: isAuthenticated
           ? const MainScreen()
           : LockScreen(
@@ -129,22 +143,22 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
         onDestinationSelected: (index) {
           _navigateToTab(index);
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.access_time),
-            label: '时钟',
+            icon: const Icon(Icons.access_time),
+            label: AppLocalizations.of(context)!.clock,
           ),
           NavigationDestination(
-            icon: Icon(Icons.celebration),
-            label: '纪念日',
+            icon: const Icon(Icons.celebration),
+            label: AppLocalizations.of(context)!.anniversary,
           ),
           NavigationDestination(
-            icon: Icon(Icons.favorite),
-            label: '心愿',
+            icon: const Icon(Icons.favorite),
+            label: AppLocalizations.of(context)!.wish,
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings),
-            label: '设置',
+            icon: const Icon(Icons.settings),
+            label: AppLocalizations.of(context)!.settings,
           ),
         ],
       ),

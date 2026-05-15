@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/services/notification_service.dart';
 
 class NotificationSettingsScreen extends ConsumerStatefulWidget {
@@ -37,9 +38,11 @@ class _NotificationSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('提醒设置'),
+        title: Text(loc.notificationSettings),
       ),
       body: ListView(
         children: [
@@ -64,15 +67,15 @@ class _NotificationSettingsScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              '通知权限',
-                              style: TextStyle(
+                            Text(
+                              loc.notificationPermission,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
                             Text(
-                              _hasPermission ? '已开启' : '未开启',
+                              _hasPermission ? loc.enabled : loc.notEnabled,
                               style: TextStyle(
                                 color: _hasPermission
                                     ? Colors.green
@@ -91,7 +94,7 @@ class _NotificationSettingsScreenState
                       else
                         TextButton(
                           onPressed: _requestPermission,
-                          child: Text(_hasPermission ? '重新请求' : '开启通知'),
+                          child: Text(_hasPermission ? loc.requestAgain : loc.enableNotification),
                         ),
                     ],
                   ),
@@ -99,11 +102,11 @@ class _NotificationSettingsScreenState
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              '开启通知权限后，纪念日和心愿将在设定日期的前一天上午9:00提醒您。',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+              loc.notificationDescription,
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
             ),
           ),
         ],

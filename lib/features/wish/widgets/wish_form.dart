@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../models/countdown_target.dart';
 
 class WishForm extends StatefulWidget {
@@ -39,6 +40,7 @@ class _WishFormState extends State<WishForm> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -53,19 +55,19 @@ class _WishFormState extends State<WishForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.target == null ? '添加心愿' : '编辑心愿',
+                widget.target == null ? loc.addWish : loc.editWish,
                 style: theme.textTheme.titleLarge,
               ),
               const SizedBox(height: 24),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: '心愿名称',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: loc.wishName,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '请输入心愿名称';
+                    return loc.enterWishName;
                   }
                   return null;
                 },
@@ -73,11 +75,11 @@ class _WishFormState extends State<WishForm> {
               const SizedBox(height: 16),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('目标日期（可选）'),
+                title: Text(loc.targetDateOptional),
                 subtitle: Text(
                   _selectedDate != null
                       ? '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}'
-                      : '无日期',
+                      : loc.noDate,
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -99,7 +101,7 @@ class _WishFormState extends State<WishForm> {
               const SizedBox(height: 16),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('通知提醒'),
+                title: Text(loc.notification),
                 value: _hasNotification,
                 onChanged: (value) {
                   setState(() {
@@ -113,12 +115,12 @@ class _WishFormState extends State<WishForm> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('取消'),
+                    child: Text(loc.cancel),
                   ),
                   const SizedBox(width: 16),
                   FilledButton(
                     onPressed: _save,
-                    child: const Text('保存'),
+                    child: Text(loc.save),
                   ),
                 ],
               ),

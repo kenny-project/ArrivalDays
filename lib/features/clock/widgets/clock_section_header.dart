@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ClockSectionHeader extends StatelessWidget {
   final String title;
@@ -28,7 +29,7 @@ class ClockSectionHeader extends StatelessWidget {
           if (onSeeAllPressed != null)
             TextButton(
               onPressed: onSeeAllPressed,
-              child: const Text('查看全部'),
+              child: Text(AppLocalizations.of(context)!.seeAll),
             ),
         ],
       ),

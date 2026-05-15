@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/countdown_utils.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../models/countdown_target.dart';
 import '../../../shared/providers/countdown_targets_provider.dart';
 import '../../../shared/widgets/countdown_display.dart';
@@ -15,6 +16,7 @@ class AnniversaryDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -71,7 +73,7 @@ class AnniversaryDetailScreen extends ConsumerWidget {
                   if (target.targetDate != null) ...[
                     if (target.type == CountdownTargetType.birthday) ...[
                       Text(
-                        '年龄: ${CountdownUtils.calculateAge(target.targetDate!)}岁',
+                        '${loc.ageLabel}: ${CountdownUtils.calculateAge(target.targetDate!)}${loc.yearsOld}',
                         style: theme.textTheme.bodyLarge,
                       ),
                       const SizedBox(height: 8),
@@ -84,12 +86,12 @@ class AnniversaryDetailScreen extends ConsumerWidget {
                   ],
                   const SizedBox(height: 16),
                   SwitchListTile(
-                    title: const Text('每年重复'),
+                    title: Text(loc.recurring),
                     value: target.isRecurring,
                     onChanged: null,
                   ),
                   SwitchListTile(
-                    title: const Text('通知提醒'),
+                    title: Text(loc.notification),
                     value: target.hasNotification,
                     onChanged: null,
                   ),
@@ -103,6 +105,7 @@ class AnniversaryDetailScreen extends ConsumerWidget {
   }
 
   void _showEditDialog(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -114,7 +117,7 @@ class AnniversaryDetailScreen extends ConsumerWidget {
             Navigator.pop(context);
           } else if (!success && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('保存失败')),
+              SnackBar(content: Text(loc.saveFailed)),
             );
           }
           return success;
@@ -124,16 +127,17 @@ class AnniversaryDetailScreen extends ConsumerWidget {
   }
 
   void _showDeleteDialog(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     final viewModel = ref.read(anniversaryViewModelProvider);
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('删除确认'),
-        content: Text('确定要删除 "${target.name}" 吗？'),
+        title: Text(loc.deleteConfirm),
+        content: Text('${loc.deleteConfirmDesc} "${target.name}" ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -141,7 +145,7 @@ class AnniversaryDetailScreen extends ConsumerWidget {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            child: const Text('删除', style: TextStyle(color: Colors.red)),
+            child: Text(loc.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),

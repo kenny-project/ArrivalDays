@@ -14,7 +14,7 @@ class UserSettings {
     this.retirementDate,
     this.lifeExpectancy = 80,
     this.isDarkMode = false,
-    this.language = 'zh',
+    this.language = 'system',
     required this.createdAt,
     required this.updatedAt,
   });
@@ -63,7 +63,7 @@ class UserSettings {
           : null,
       lifeExpectancy: map['life_expectancy'] as int? ?? 80,
       isDarkMode: (map['is_dark_mode'] as int?) == 1,
-      language: map['language'] as String? ?? 'zh',
+      language: map['language'] as String? ?? 'system',
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
     );

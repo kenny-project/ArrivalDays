@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/countdown_utils.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/providers/user_settings_provider.dart';
 import '../../../shared/providers/life_timer_provider.dart';
 import '../providers/clock_provider.dart';
@@ -13,8 +14,8 @@ class LifeTimerCard extends ConsumerWidget {
     final lifeTimer = ref.watch(lifeTimerProvider);
     final settings = ref.watch(userSettingsProvider);
     final retirementDate = ref.watch(retirementTimerProvider);
-    // debug: Log.i(LogTag.ui, 'LifeTimerCard build - lifeTimer: ${lifeTimer?.targetDate}, retirementDate: $retirementDate');
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
 
     return Card(
       margin: const EdgeInsets.all(16),
@@ -30,7 +31,7 @@ class LifeTimerCard extends ConsumerWidget {
                 Icon(Icons.timer, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  '人生定时器',
+                  loc.lifeTimer,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -41,7 +42,7 @@ class LifeTimerCard extends ConsumerWidget {
             if (lifeTimer?.targetDate != null) ...[
               _buildCountdownRow(
                 context,
-                '距离理想离开',
+                loc.distanceFromLeaving,
                 CountdownUtils.calculateCountdown(lifeTimer!.targetDate!),
               ),
               const SizedBox(height: 8),
@@ -50,7 +51,7 @@ class LifeTimerCard extends ConsumerWidget {
             ] else
               Center(
                 child: Text(
-                  '设置你的理想离开日期',
+                  loc.setIdealLeaveDate,
                   style: theme.textTheme.bodyLarge,
                 ),
               ),
@@ -58,7 +59,7 @@ class LifeTimerCard extends ConsumerWidget {
               const SizedBox(height: 8),
               _buildCountdownRow(
                 context,
-                '距离退休',
+                loc.distanceFromRetirement,
                 CountdownUtils.calculateCountdown(retirementDate),
               ),
             ],
@@ -70,6 +71,7 @@ class LifeTimerCard extends ConsumerWidget {
 
   Widget _buildCountdownRow(BuildContext context, String label, CountdownDuration countdown) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
     final isOverdue = countdown.isOverdue;
 
     return Row(
@@ -80,8 +82,8 @@ class LifeTimerCard extends ConsumerWidget {
         ),
         Text(
           isOverdue
-              ? '已过去${countdown.toDisplayString()}'
-              : countdown.toDisplayString(),
+              ? '${loc.elapsed}${countdown.toDisplayString(loc: loc.countdownLoc)}'
+              : countdown.toDisplayString(loc: loc.countdownLoc),
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: isOverdue ? Colors.red : theme.colorScheme.primary,
@@ -93,6 +95,7 @@ class LifeTimerCard extends ConsumerWidget {
 
   Widget _buildElapsedRow(BuildContext context, DateTime birthDate) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
     final elapsed = DateTime.now().difference(birthDate);
     final years = elapsed.inDays ~/ 365;
     final months = (elapsed.inDays % 365) ~/ 30;
@@ -102,11 +105,11 @@ class LifeTimerCard extends ConsumerWidget {
     return Row(
       children: [
         Text(
-          '已过去: ',
+          '${loc.elapsed}: ',
           style: theme.textTheme.bodyMedium,
         ),
         Text(
-          '${years}年${months}月${hours.toString().padLeft(2, '0')}时${minutes.toString().padLeft(2, '0')}分',
+          '$years${loc.years}$months${loc.months}${hours.toString().padLeft(2, '0')}${loc.hours}${minutes.toString().padLeft(2, '0')}${loc.minutes}',
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: theme.colorScheme.secondary,

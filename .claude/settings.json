@@ -36,7 +36,9 @@
       "WebSearch",
       "Bash(flutter install *)",
       "Bash(git checkout *)",
-      "Bash(git merge *)"
+      "Bash(git merge *)",
+      "Bash(./gradlew assembleDebug --stacktrace)",
+      "Bash(flutter clean *)"
     ]
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../models/countdown_target.dart';
 import '../../../core/utils/countdown_utils.dart';
 
@@ -47,6 +48,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -61,19 +63,19 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.target == null ? '添加纪念日' : '编辑纪念日',
+                widget.target == null ? loc.addAnniversary : loc.editAnniversary,
                 style: theme.textTheme.titleLarge,
               ),
               const SizedBox(height: 24),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: '名称',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: loc.name,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '请输入名称';
+                    return loc.enterName;
                   }
                   return null;
                 },
@@ -83,9 +85,9 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
                 children: [
                   Expanded(
                     child: SegmentedButton<bool>(
-                      segments: const [
-                        ButtonSegment(value: false, label: Text('纪念日')),
-                        ButtonSegment(value: true, label: Text('生日')),
+                      segments: [
+                        ButtonSegment(value: false, label: Text(loc.anniversary)),
+                        ButtonSegment(value: true, label: Text(loc.birthday)),
                       ],
                       selected: {_isBirthday},
                       onSelectionChanged: (selected) {
@@ -103,11 +105,11 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
               const SizedBox(height: 16),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('日期'),
+                title: Text(loc.date),
                 subtitle: Text(
                   _selectedDate != null
                       ? '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}'
-                      : '请选择日期',
+                      : loc.selectDate,
                 ),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: _selectDate,
@@ -116,7 +118,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
                 Padding(
                   padding: const EdgeInsets.only(left: 16, top: 4),
                   child: Text(
-                    '请选择日期',
+                    loc.selectDate,
                     style: TextStyle(
                       color: theme.colorScheme.error,
                       fontSize: 12,
@@ -126,7 +128,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
               const SizedBox(height: 16),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('每年重复'),
+                title: Text(loc.recurring),
                 value: _isRecurring,
                 onChanged: _isBirthday
                     ? null
@@ -139,7 +141,7 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
               if (_isBirthday) ...[
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('农历'),
+                  title: Text(loc.translate('lunarSuffix').replaceAll('(', '').replaceAll(')', '')),
                   value: _isLunarCalendar,
                   onChanged: (value) {
                     setState(() {
@@ -152,17 +154,17 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
               if (_isLunarCalendar) ...[
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('生肖'),
+                  title: Text(loc.zodiac),
                   subtitle: Text(
                     _selectedDate != null
-                        ? '属${CountdownUtils.calculateZodiac(_selectedDate!.year)}'
-                        : '选择日期后显示',
+                        ? CountdownUtils.calculateZodiac(_selectedDate!.year)
+                        : loc.selectDateFirst,
                   ),
                 ),
               ],
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('通知提醒'),
+                title: Text(loc.notification),
                 value: _hasNotification,
                 onChanged: (value) {
                   setState(() {
@@ -176,12 +178,12 @@ class _AnniversaryFormState extends State<AnniversaryForm> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('取消'),
+                    child: Text(loc.cancel),
                   ),
                   const SizedBox(width: 16),
                   FilledButton(
                     onPressed: _save,
-                    child: const Text('保存'),
+                    child: Text(loc.save),
                   ),
                 ],
               ),

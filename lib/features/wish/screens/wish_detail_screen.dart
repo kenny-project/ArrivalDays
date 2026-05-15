@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../models/countdown_target.dart';
 import '../../../shared/providers/countdown_targets_provider.dart';
 import '../../../shared/widgets/countdown_display.dart';
@@ -14,6 +15,7 @@ class WishDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
     final viewModel = ref.watch(wishViewModelProvider);
 
     return Scaffold(
@@ -59,15 +61,15 @@ class WishDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 24),
                   if (target.targetDate != null) ...[
-                    const Text('目标日期'),
+                    Text(loc.targetDate),
                     const SizedBox(height: 8),
                     CountdownDisplay(targetDate: target.targetDate!),
                   ] else
-                    const Text('无日期限制'),
+                    Text(loc.noDateLimit),
                   const SizedBox(height: 16),
                   if (target.isCompleted && target.completedAt != null) ...[
                     Text(
-                      '完成于: ${target.completedAt!.toString().split(' ')[0]}',
+                      '${loc.completedOn}: ${target.completedAt!.toString().split(' ')[0]}',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.green,
                       ),
@@ -78,7 +80,7 @@ class WishDetailScreen extends ConsumerWidget {
                         viewModel.reactivateWish(target.id);
                         Navigator.pop(context);
                       },
-                      child: const Text('重新激活'),
+                      child: Text(loc.reactivate),
                     ),
                   ] else
                     FilledButton(
@@ -86,7 +88,7 @@ class WishDetailScreen extends ConsumerWidget {
                         viewModel.completeWish(target.id);
                         Navigator.pop(context);
                       },
-                      child: const Text('标记完成'),
+                      child: Text(loc.markComplete),
                     ),
                 ],
               ),
@@ -98,6 +100,7 @@ class WishDetailScreen extends ConsumerWidget {
   }
 
   void _showEditDialog(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -109,7 +112,7 @@ class WishDetailScreen extends ConsumerWidget {
             Navigator.pop(context);
           } else if (!success && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('保存失败')),
+              SnackBar(content: Text(loc.saveFailed)),
             );
           }
           return success;
@@ -119,15 +122,16 @@ class WishDetailScreen extends ConsumerWidget {
   }
 
   void _showDeleteDialog(BuildContext context, WishViewModel viewModel) {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('删除确认'),
-        content: Text('确定要删除 "${target.name}" 吗？'),
+        title: Text(loc.deleteConfirm),
+        content: Text('${loc.deleteConfirmDesc} "${target.name}" ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -135,7 +139,7 @@ class WishDetailScreen extends ConsumerWidget {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            child: const Text('删除', style: TextStyle(color: Colors.red)),
+            child: Text(loc.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),

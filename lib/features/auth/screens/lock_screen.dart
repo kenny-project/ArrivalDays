@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/services/auth_service.dart';
 
 class LockScreen extends ConsumerStatefulWidget {
@@ -41,7 +42,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
 
   Future<void> _tryBiometric() async {
     final success = await AuthService.instance.authenticateWithBiometric(
-      reason: '验证身份以解锁应用',
+      reason: AppLocalizations.of(context)?.verifyIdentityToUnlock ?? 'Verify identity to unlock',
     );
     if (success && mounted) {
       widget.onAuthenticated();
@@ -87,7 +88,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
         setState(() {
           _pin.clear();
           _isVerifying = false;
-          _error = '密码错误';
+          _error = AppLocalizations.of(context)?.pinIncorrect ?? 'Incorrect PIN';
         });
       }
     }
@@ -96,6 +97,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
@@ -110,7 +112,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              '人生倒计时',
+              loc.appTitle,
               style: theme.textTheme.headlineSmall,
             ),
             const Spacer(flex: 1),
@@ -138,7 +140,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                 child: IconButton(
                   onPressed: _tryBiometric,
                   icon: const Icon(Icons.fingerprint, size: 40),
-                  tooltip: '指纹/面容解锁',
+                  tooltip: loc.biometricUnlock,
                 ),
               )
             else

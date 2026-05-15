@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/countdown_item.dart';
 import '../../../shared/providers/countdown_targets_provider.dart';
 import '../providers/clock_provider.dart';
@@ -34,12 +35,13 @@ class _ClockScreenState extends ConsumerState<ClockScreen> {
   @override
   Widget build(BuildContext context) {
     ref.watch(tickerProvider); // watch ticker to trigger rebuild
+    final loc = AppLocalizations.of(context)!;
     final anniversaries = ref.watch(anniversaryListProvider);
     final wishes = ref.watch(wishListProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('人生倒计时'),
+        title: Text(loc.appTitle),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -49,14 +51,14 @@ class _ClockScreenState extends ConsumerState<ClockScreen> {
           children: [
             LifeTimerCard(),
             ClockSectionHeader(
-              title: '纪念日',
+              title: loc.anniversary,
               onSeeAllPressed: widget.onNavigateToAnniversary,
             ),
             if (anniversaries.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(32),
+              Padding(
+                padding: const EdgeInsets.all(32),
                 child: Center(
-                  child: Text('暂无纪念日'),
+                  child: Text(loc.noAnniversary),
                 ),
               )
             else
@@ -67,14 +69,14 @@ class _ClockScreenState extends ConsumerState<ClockScreen> {
                     showDeleteAction: false,
                   )),
             ClockSectionHeader(
-              title: '心愿',
+              title: loc.wish,
               onSeeAllPressed: widget.onNavigateToWish,
             ),
             if (wishes.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(32),
+              Padding(
+                padding: const EdgeInsets.all(32),
                 child: Center(
-                  child: Text('暂无心愿'),
+                  child: Text(loc.noWish),
                 ),
               )
             else

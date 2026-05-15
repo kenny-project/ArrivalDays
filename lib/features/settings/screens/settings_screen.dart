@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../models/user_settings.dart';
 import '../../../shared/providers/user_settings_provider.dart';
 import '../../../core/services/export_service.dart';
@@ -28,45 +29,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final settings = ref.watch(userSettingsProvider);
     // debug: Log.i(LogTag.ui, 'SettingsScreen settings: ${settings?.birthDate}');
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('设置'),
+        title: Text(loc.settings),
       ),
       body: settings == null
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
-                _buildSectionHeader('基本信息'),
+                _buildSectionHeader(loc.basicInfo),
                 ListTile(
                   leading: const Icon(Icons.cake),
-                  title: const Text('出生日期'),
+                  title: Text(loc.birthDate),
                   subtitle: Text(_formatDate(settings.birthDate)),
                   onTap: () => _selectBirthDate(settings),
                 ),
                 ListTile(
                   leading: const Icon(Icons.work),
-                  title: const Text('计划退休日'),
+                  title: Text(loc.retirementDate),
                   subtitle: Text(
                     settings.retirementDate != null
                         ? _formatDate(settings.retirementDate!)
-                        : '未设置',
+                        : loc.notSet,
                   ),
                   onTap: () => _selectRetirementDate(settings),
                 ),
                 ListTile(
                   leading: const Icon(Icons.timeline),
-                  title: const Text('预期寿命'),
-                  subtitle: Text('${settings.lifeExpectancy} 岁'),
+                  title: Text(loc.lifeExpectancy),
+                  subtitle: Text('${settings.lifeExpectancy} ${loc.age}'),
                   onTap: () => _selectLifeExpectancy(settings),
                 ),
                 const Divider(),
-                _buildSectionHeader('外观'),
+                _buildSectionHeader(loc.appearance),
                 SwitchListTile(
                   secondary: const Icon(Icons.dark_mode),
-                  title: const Text('深色主题'),
+                  title: Text(loc.darkMode),
                   value: settings.isDarkMode,
                   onChanged: (_) {
                     ref.read(settingsViewModelProvider).toggleDarkMode();
@@ -74,13 +76,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.language),
-                  title: const Text('语言'),
-                  subtitle: Text(settings.language == 'zh' ? '中文' : 'English'),
+                  title: Text(loc.language),
+                  subtitle: Text(
+                    settings.language == 'system'
+                        ? loc.followSystem
+                        : settings.language == 'zh'
+                            ? loc.chinese
+                            : 'English',
+                  ),
                   onTap: _selectLanguage,
                 ),
                 ListTile(
                   leading: const Icon(Icons.lock),
-                  title: const Text('登录密码'),
+                  title: Text(loc.loginPassword),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.push(
@@ -92,10 +100,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   },
                 ),
                 const Divider(),
-                _buildSectionHeader('功能'),
+                _buildSectionHeader(loc.features),
                 ListTile(
                   leading: const Icon(Icons.notifications),
-                  title: const Text('提醒设置'),
+                  title: Text(loc.notificationSettings),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.push(
@@ -108,17 +116,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.sync),
-                  title: const Text('数据同步'),
+                  title: Text(loc.dataSync),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('数据同步功能（预留接口）')),
+                      SnackBar(content: Text(loc.dataSyncPlaceholder)),
                     );
                   },
                 ),
                 ListTile(
                   leading: const Icon(Icons.file_upload),
-                  title: const Text('数据导出'),
+                  title: Text(loc.dataExport),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
                     await ExportService.instance.shareExport();
@@ -126,14 +134,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.file_download),
-                  title: const Text('数据导入'),
+                  title: Text(loc.dataImport),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
                     final success = await ExportService.instance.importFromFile();
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(success ? '导入成功' : '导入失败'),
+                          content: Text(success ? loc.importSuccess : loc.importFail),
                         ),
                       );
                     }
@@ -141,16 +149,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.delete_forever, color: Colors.red),
-                  title: const Text('数据重置', style: TextStyle(color: Colors.red)),
+                  title: Text(loc.dataReset, style: const TextStyle(color: Colors.red)),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => _resetData(context),
                 ),
                 const Divider(),
-                _buildSectionHeader('关于'),
-                const ListTile(
-                  leading: Icon(Icons.info),
-                  title: Text('版本'),
-                  subtitle: Text('v1.0.0'),
+                _buildSectionHeader(loc.about),
+                ListTile(
+                  leading: const Icon(Icons.info),
+                  title: Text(loc.version),
+                  subtitle: const Text('v1.0.0'),
                 ),
               ],
             ),
@@ -200,27 +208,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _selectLifeExpectancy(UserSettings settings) async {
+    final loc = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: settings.lifeExpectancy.toString());
     final result = await showDialog<int>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('预期寿命'),
+        title: Text(loc.lifeExpectancy),
         content: TextField(
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            labelText: '年龄',
-            hintText: '请输入预期寿命',
+          decoration: InputDecoration(
+            labelText: loc.ageHint,
+            hintText: loc.enterLifeExpectancy,
           ),
           controller: controller,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, int.tryParse(controller.text)),
-            child: const Text('确定'),
+            child: Text(loc.confirm),
           ),
         ],
       ),
@@ -231,14 +240,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _selectLanguage() async {
+    final loc = AppLocalizations.of(context)!;
     final result = await showDialog<String>(
       context: context,
       builder: (_) => SimpleDialog(
-        title: const Text('选择语言'),
+        title: Text(loc.selectLanguage),
         children: [
           SimpleDialogOption(
+            onPressed: () => Navigator.pop(context, 'system'),
+            child: Text(loc.followSystem),
+          ),
+          SimpleDialogOption(
             onPressed: () => Navigator.pop(context, 'zh'),
-            child: const Text('中文'),
+            child: Text(loc.chinese),
           ),
           SimpleDialogOption(
             onPressed: () => Navigator.pop(context, 'en'),
@@ -253,6 +267,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _resetData(BuildContext context) async {
+    final loc = AppLocalizations.of(context)!;
     // Verify identity if PIN is set
     final hasPin = await AuthService.instance.hasPin();
     if (hasPin) {
@@ -261,7 +276,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
       if (biometricEnabled) {
         verified = await AuthService.instance.authenticateWithBiometric(
-          reason: '验证身份以重置数据',
+          reason: loc.verifyIdentityToReset,
         );
       }
 
@@ -271,7 +286,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         final pin = await showDialog<String>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('验证密码'),
+            title: Text(loc.verifyPassword),
             content: TextField(
               controller: controller,
               keyboardType: TextInputType.number,
@@ -284,11 +299,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('取消'),
+                child: Text(loc.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, controller.text),
-                child: const Text('确定'),
+                child: Text(loc.confirm),
               ),
             ],
           ),
@@ -300,7 +315,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         if (!verified) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('密码错误')),
+              SnackBar(content: Text(loc.pinIncorrect)),
             );
           }
           return;
@@ -313,16 +328,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('确定要清除所有数据吗？'),
-        content: const Text('此操作不可恢复，所有设置和倒计时数据将被删除。'),
+        title: Text(loc.resetConfirmTitle),
+        content: Text(loc.resetConfirmDesc),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('确定', style: TextStyle(color: Colors.red)),
+            child: Text(loc.confirm, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -347,7 +362,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('数据已重置')),
+        SnackBar(content: Text(loc.dataResetDone)),
       );
     }
   }

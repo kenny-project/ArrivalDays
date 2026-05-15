@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../models/countdown_target.dart';
 import '../../../shared/widgets/countdown_item.dart';
 import '../../../shared/widgets/empty_state.dart';
@@ -31,6 +32,7 @@ class _AnniversaryListScreenState extends ConsumerState<AnniversaryListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final targets = ref.watch(countdownTargetsProvider);
     final anniversaries = targets
         .where((t) => t.type == CountdownTargetType.anniversary || t.type == CountdownTargetType.birthday)
@@ -43,13 +45,13 @@ class _AnniversaryListScreenState extends ConsumerState<AnniversaryListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('纪念日'),
+        title: Text(loc.anniversary),
       ),
       body: anniversaries.isEmpty
           ? EmptyState(
-              message: '还没有纪念日，添加第一个吧',
+              message: loc.emptyAnniversary,
               onAddPressed: () => _showAddDialog(context),
-              buttonText: '添加纪念日',
+              buttonText: loc.addAnniversary,
             )
           : ListView.builder(
               controller: _scrollController,
@@ -87,7 +89,7 @@ class _AnniversaryListScreenState extends ConsumerState<AnniversaryListScreen> {
             Navigator.pop(context);
           } else if (!success && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('保存失败')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.saveFailed)),
             );
           }
           return success;
@@ -108,7 +110,7 @@ class _AnniversaryListScreenState extends ConsumerState<AnniversaryListScreen> {
             Navigator.pop(context);
           } else if (!success && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('保存失败')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.saveFailed)),
             );
           }
           return success;

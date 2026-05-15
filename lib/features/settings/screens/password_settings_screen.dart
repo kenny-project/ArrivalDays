@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/services/auth_service.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -184,9 +185,10 @@ class _PasswordSettingsScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('登录密码')),
+      appBar: AppBar(title: Text(loc.loginPassword)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
@@ -194,35 +196,35 @@ class _PasswordSettingsScreenState
                 if (!_hasPin) ...[
                   ListTile(
                     leading: const Icon(Icons.lock_outline),
-                    title: const Text('设置密码'),
-                    subtitle: const Text('设置6位数字密码保护应用'),
+                    title: Text(loc.setPassword),
+                    subtitle: Text(loc.setPasswordDesc),
                     onTap: _setupPin,
                   ),
                 ] else ...[
                   ListTile(
                     leading: const Icon(Icons.lock),
-                    title: const Text('已设置密码'),
-                    subtitle: const Text('应用将在冷启动时要求验证'),
+                    title: Text(loc.passwordSetStatus),
+                    subtitle: Text(loc.passwordVerifyDesc),
                     trailing: Icon(Icons.check_circle,
                         color: theme.colorScheme.primary),
                   ),
                   const Divider(),
                   ListTile(
                     leading: const Icon(Icons.edit),
-                    title: const Text('修改密码'),
+                    title: Text(loc.changePassword),
                     onTap: _changePin,
                   ),
                   ListTile(
                     leading: const Icon(Icons.lock_open),
-                    title: const Text('关闭密码'),
+                    title: Text(loc.disablePassword),
                     onTap: _disablePin,
                   ),
                   if (_canCheckBiometrics) ...[
                     const Divider(),
                     SwitchListTile(
                       secondary: const Icon(Icons.fingerprint),
-                      title: const Text('指纹/面容解锁'),
-                      subtitle: const Text('使用生物识别快速解锁'),
+                      title: Text(loc.biometricUnlock),
+                      subtitle: Text(loc.biometricUnlockDesc),
                       value: _biometricEnabled,
                       onChanged: _toggleBiometric,
                     ),
@@ -243,16 +245,19 @@ class _PasswordSettingsScreenState
   }
 
   Future<void> _setupPin() async {
-    final pin = await _navigateToPinInput('设置密码');
+    final loc = AppLocalizations.of(context)!;
+    final pin = await _navigateToPinInput(loc.setPassword);
     if (pin == null || !mounted) return;
 
-    final confirm = await _navigateToPinInput('确认密码');
-    if (confirm == null || !mounted) return;
+    final confirmPin = await _navigateToPinInput(loc.confirmPassword);
+    if (confirmPin == null || !mounted) return;
 
-    if (pin != confirm) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('两次输入的密码不一致')),
-      );
+    if (pin != confirmPin) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.pinMismatch)),
+        );
+      }
       return;
     }
 
@@ -266,29 +271,32 @@ class _PasswordSettingsScreenState
   }
 
   Future<void> _changePin() async {
-    final oldPin = await _navigateToPinInput('验证当前密码');
+    final loc = AppLocalizations.of(context)!;
+    final oldPin = await _navigateToPinInput(loc.verifyCurrentPassword);
     if (oldPin == null || !mounted) return;
 
     final correct = await AuthService.instance.verifyPin(oldPin);
     if (!correct) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('当前密码错误')),
+          SnackBar(content: Text(loc.currentPasswordIncorrect)),
         );
       }
       return;
     }
 
-    final newPin = await _navigateToPinInput('设置新密码');
+    final newPin = await _navigateToPinInput(loc.setNewPassword);
     if (newPin == null || !mounted) return;
 
-    final confirm = await _navigateToPinInput('确认新密码');
-    if (confirm == null || !mounted) return;
+    final confirmPin = await _navigateToPinInput(loc.confirmNewPassword);
+    if (confirmPin == null || !mounted) return;
 
-    if (newPin != confirm) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('两次输入的密码不一致')),
-      );
+    if (newPin != confirmPin) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.pinMismatch)),
+        );
+      }
       return;
     }
 
@@ -296,12 +304,13 @@ class _PasswordSettingsScreenState
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('密码已修改')),
+        SnackBar(content: Text(loc.passwordChanged)),
       );
     }
   }
 
   Future<void> _disablePin() async {
+    final loc = AppLocalizations.of(context)!;
     final success = await _verifyIdentity();
     if (!success || !mounted) return;
 
@@ -313,20 +322,21 @@ class _PasswordSettingsScreenState
         _biometricEnabled = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('密码已关闭')),
+        SnackBar(content: Text(loc.passwordDisabled)),
       );
     }
   }
 
   Future<void> _toggleBiometric(bool enabled) async {
+    final loc = AppLocalizations.of(context)!;
     if (enabled) {
       final success = await AuthService.instance.authenticateWithBiometric(
-        reason: '验证身份以启用生物识别',
+        reason: loc.verifyIdentityForBiometric,
       );
       if (!success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('生物识别验证失败，请确认已录入指纹/面容')),
+            SnackBar(content: Text(loc.biometricVerifyFailed)),
           );
         }
         return;
@@ -341,14 +351,15 @@ class _PasswordSettingsScreenState
   }
 
   Future<bool> _verifyIdentity() async {
+    final loc = AppLocalizations.of(context)!;
     if (_biometricEnabled && _canCheckBiometrics) {
       final success = await AuthService.instance.authenticateWithBiometric(
-        reason: '验证身份',
+        reason: loc.verifyIdentity,
       );
       if (success) return true;
     }
 
-    final pin = await _navigateToPinInput('验证密码');
+    final pin = await _navigateToPinInput(loc.verifyPassword);
     if (pin == null) return false;
 
     return await AuthService.instance.verifyPin(pin);
@@ -356,26 +367,27 @@ class _PasswordSettingsScreenState
 
   Future<void> _askEnableBiometric() async {
     if (!_canCheckBiometrics || !mounted) return;
+    final loc = AppLocalizations.of(context)!;
 
-    final enable = await showDialog<bool>(
+    final shouldEnable = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('启用生物识别？'),
-        content: const Text('是否使用指纹/面容快速解锁应用？'),
+        title: Text(loc.enableBiometric),
+        content: Text(loc.enableBiometricDesc),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('跳过'),
+            child: Text(loc.skip),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('启用'),
+            child: Text(loc.enable),
           ),
         ],
       ),
     );
 
-    if (enable == true) {
+    if (shouldEnable == true) {
       await _toggleBiometric(true);
     }
   }

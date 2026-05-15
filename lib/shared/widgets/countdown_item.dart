@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/utils/countdown_utils.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/countdown_target.dart';
 
 class CountdownItem extends StatelessWidget {
@@ -42,20 +43,20 @@ class CountdownItem extends StatelessWidget {
     return target.name;
   }
 
-  String _formatDisplayDate(CountdownTarget target) {
+  String _formatDisplayDate(CountdownTarget target, AppLocalizations loc) {
     final date = target.useDate ?? target.targetDate;
     if (date == null) return '';
 
     final dateStr = '${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
     if (target.isLunarCalendar) {
-      return '$dateStr(农历)';
+      return '$dateStr${loc.lunarSuffix}';
     }
     return dateStr;
   }
 
-  String get _countdownText {
+  String _getCountdownText(AppLocalizations loc) {
     if (target.targetDate == null) {
-      return '无日期';
+      return loc.noDate;
     }
 
     final displayTarget = target.isRecurring && target.type == CountdownTargetType.birthday
@@ -63,25 +64,28 @@ class CountdownItem extends StatelessWidget {
         : target.targetDate!;
 
     final countdown = CountdownUtils.calculateCountdown(displayTarget);
+    final cLoc = loc.countdownLoc;
 
     if (target.type == CountdownTargetType.birthday) {
       if (target.isLunarCalendar) {
-        return '${countdown.isOverdue ? '已过去' : '距离生日还有'}${countdown.toMinimalDisplayString()}';
+        return '${countdown.isOverdue ? loc.elapsed : loc.daysUntilBirthday}${countdown.toMinimalDisplayString(loc: cLoc)}';
       } else {
         final age = CountdownUtils.calculateAge(target.targetDate!);
-        return '今年${age}周岁 ${countdown.isOverdue ? '已过去' : '距离生日还有'}${countdown.toMinimalDisplayString()}';
+        return '${loc.thisYear}$age${loc.yearsOld} ${countdown.isOverdue ? loc.elapsed : loc.daysUntilBirthday}${countdown.toMinimalDisplayString(loc: cLoc)}';
       }
     }
 
     return countdown.isOverdue
-        ? '已过去${countdown.toMinimalDisplayString()}'
-        : '距离${countdown.toMinimalDisplayString()}';
+        ? '${loc.elapsed}${countdown.toMinimalDisplayString(loc: cLoc)}'
+        : '${loc.distance}${countdown.toMinimalDisplayString(loc: cLoc)}';
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
     final isBirthday = target.type == CountdownTargetType.birthday;
+    final displayDate = _formatDisplayDate(target, loc);
 
     return Dismissible(
       key: Key(target.id),
@@ -102,12 +106,12 @@ class CountdownItem extends StatelessWidget {
       child: ListTile(
         leading: Icon(_icon, color: isBirthday ? Colors.pink : theme.colorScheme.primary),
         title: Text(
-          _formatDisplayDate(target).isEmpty
+          displayDate.isEmpty
               ? _displayName
-              : '$_displayName（${_formatDisplayDate(target)}）',
+              : '$_displayName（$displayDate）',
         ),
         subtitle: Text(
-          _countdownText,
+          _getCountdownText(loc),
           style: TextStyle(
             color: isOverdue ? Colors.red : null,
           ),

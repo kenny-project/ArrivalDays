@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../models/countdown_target.dart';
 import '../../../shared/widgets/countdown_item.dart';
 import '../../../shared/widgets/empty_state.dart';
@@ -38,16 +39,17 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final viewModel = ref.watch(wishViewModelProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('心愿'),
+        title: Text(loc.wish),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: '未完成'),
-            Tab(text: '已完成'),
+          tabs: [
+            Tab(text: loc.uncompleted),
+            Tab(text: loc.completed),
           ],
         ),
       ),
@@ -66,13 +68,14 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
   }
 
   Widget _buildUncompletedList(WishViewModel viewModel) {
+    final loc = AppLocalizations.of(context)!;
     final wishes = viewModel.uncompletedWishes;
 
     if (wishes.isEmpty) {
       return EmptyState(
-        message: '还没有心愿，添加第一个吧',
+        message: loc.emptyWish,
         onAddPressed: () => _showAddDialog(context),
-        buttonText: '添加心愿',
+        buttonText: loc.addWish,
       );
     }
 
@@ -101,10 +104,11 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
   }
 
   Widget _buildCompletedList(WishViewModel viewModel) {
+    final loc = AppLocalizations.of(context)!;
     final wishes = viewModel.completedWishes;
 
     if (wishes.isEmpty) {
-      return const EmptyState(message: '暂无已完成的心愿');
+      return EmptyState(message: loc.noCompletedWish);
     }
 
     return ListView.builder(
@@ -127,13 +131,13 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
             leading: const Icon(Icons.check_circle, color: Colors.green),
             title: Text(target.name),
             subtitle: target.completedAt != null
-                ? Text('完成于: ${target.completedAt!.toString().split(' ')[0]}')
+                ? Text('${loc.completedAt}: ${target.completedAt!.toString().split(' ')[0]}')
                 : null,
             trailing: TextButton(
               onPressed: () {
                 viewModel.reactivateWish(target.id);
               },
-              child: const Text('重新激活'),
+              child: Text(loc.reactivate),
             ),
             onTap: () => _showEditDialog(context, target),
           ),
@@ -153,7 +157,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
             Navigator.pop(context);
           } else if (!success && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('保存失败')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.saveFailed)),
             );
           }
           return success;
@@ -174,7 +178,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
             Navigator.pop(context);
           } else if (!success && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('保存失败')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.saveFailed)),
             );
           }
           return success;

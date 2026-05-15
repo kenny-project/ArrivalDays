@@ -1,3 +1,39 @@
+class CountdownLocalizations {
+  final String years;
+  final String months;
+  final String days;
+  final String hours;
+  final String minutes;
+  final String seconds;
+  final String hoursAlt; // '小时' / 'h'
+  final String minutesAlt; // '分钟' / 'min'
+  final String soon; // '即将到来' / 'Soon'
+
+  const CountdownLocalizations({
+    required this.years,
+    required this.months,
+    required this.days,
+    required this.hours,
+    required this.minutes,
+    required this.seconds,
+    required this.hoursAlt,
+    required this.minutesAlt,
+    required this.soon,
+  });
+
+  static const zh = CountdownLocalizations(
+    years: '年', months: '月', days: '天',
+    hours: '时', minutes: '分', seconds: '秒',
+    hoursAlt: '小时', minutesAlt: '分钟', soon: '即将到来',
+  );
+
+  static const en = CountdownLocalizations(
+    years: 'y', months: 'm', days: 'd',
+    hours: 'h', minutes: 'min', seconds: 'sec',
+    hoursAlt: 'h', minutesAlt: 'min', soon: 'Soon',
+  );
+}
+
 class CountdownDuration {
   final int years;
   final int months;
@@ -17,67 +53,67 @@ class CountdownDuration {
     this.isOverdue = false,
   });
 
-  String toDisplayString({bool showSeconds = true}) {
+  String toDisplayString({bool showSeconds = true, CountdownLocalizations loc = CountdownLocalizations.zh}) {
     final parts = <String>[];
-    if (years > 0) parts.add('${years}年');
-    if (months > 0 || years > 0) parts.add('${months}月');
-    if (days > 0 || years > 0 || months > 0) parts.add('${days}天');
+    if (years > 0) parts.add('$years${loc.years}');
+    if (months > 0 || years > 0) parts.add('$months${loc.months}');
+    if (days > 0 || years > 0 || months > 0) parts.add('$days${loc.days}');
     if (hours > 0 || years > 0 || months > 0 || days > 0) {
-      parts.add('${hours.toString().padLeft(2, '0')}时');
+      parts.add('${hours.toString().padLeft(2, '0')}${loc.hours}');
     }
-    parts.add('${minutes.toString().padLeft(2, '0')}分');
+    parts.add('${minutes.toString().padLeft(2, '0')}${loc.minutes}');
     if (showSeconds) {
-      parts.add('${seconds.toString().padLeft(2, '0')}秒');
+      parts.add('${seconds.toString().padLeft(2, '0')}${loc.seconds}');
     }
     return parts.join('');
   }
 
-  String toShortDisplayString() {
+  String toShortDisplayString({CountdownLocalizations loc = CountdownLocalizations.zh}) {
     final parts = <String>[];
-    if (years > 0) parts.add('${years}年');
-    if (months > 0 || years > 0) parts.add('${months}月');
-    if (days > 0 || years > 0 || months > 0) parts.add('${days}天');
+    if (years > 0) parts.add('$years${loc.years}');
+    if (months > 0 || years > 0) parts.add('$months${loc.months}');
+    if (days > 0 || years > 0 || months > 0) parts.add('$days${loc.days}');
     if (hours > 0 || years > 0 || months > 0 || days > 0) {
-      parts.add('${hours.toString().padLeft(2, '0')}时');
+      parts.add('${hours.toString().padLeft(2, '0')}${loc.hours}');
     }
-    parts.add('${minutes.toString().padLeft(2, '0')}分');
+    parts.add('${minutes.toString().padLeft(2, '0')}${loc.minutes}');
     return parts.join('');
   }
 
-    String toMinimalDisplayString({bool showSeconds = true}) {
+  String toMinimalDisplayString({bool showSeconds = true, CountdownLocalizations loc = CountdownLocalizations.zh}) {
     if (years > 0) {
-      String result = '${years}年';
-      if (months > 0) result += '${months}月';
-      if (days > 0) result += '${days}天';
+      String result = '$years${loc.years}';
+      if (months > 0) result += '$months${loc.months}';
+      if (days > 0) result += '$days${loc.days}';
       if (months == 0) {
-        if (hours > 0) result += '${hours}时';
-        if (minutes > 0) result += '${minutes}分';
-        if (showSeconds && seconds > 0) result += '${seconds}秒';
+        if (hours > 0) result += '$hours${loc.hours}';
+        if (minutes > 0) result += '$minutes${loc.minutes}';
+        if (showSeconds && seconds > 0) result += '$seconds${loc.seconds}';
       }
       return result;
     }
     if (months > 0) {
-      String result = '${months}月';
-      if (days > 0) result += '${days}天';
+      String result = '$months${loc.months}';
+      if (days > 0) result += '$days${loc.days}';
       if (days == 0) {
-        if (hours > 0) result += '${hours}时';
-        if (minutes > 0) result += '${minutes}分';
+        if (hours > 0) result += '$hours${loc.hours}';
+        if (minutes > 0) result += '$minutes${loc.minutes}';
       }
       return result;
     }
     if (days > 0) {
-      String result = '${days}天';
-      if (hours > 0) result += '${hours}时';
-      if (minutes > 0) result += '${minutes}分';
+      String result = '$days${loc.days}';
+      if (hours > 0) result += '$hours${loc.hours}';
+      if (minutes > 0) result += '$minutes${loc.minutes}';
       return result;
     }
     if (hours > 0) {
-      String result = '${hours}小时';
-      if (minutes > 0) result += '${minutes}分';
+      String result = '$hours${loc.hoursAlt}';
+      if (minutes > 0) result += '$minutes${loc.minutes}';
       return result;
     }
-    if (minutes > 0) return '${minutes}分钟';
-    return '即将到来';
+    if (minutes > 0) return '$minutes${loc.minutesAlt}';
+    return loc.soon;
   }
 }
 
